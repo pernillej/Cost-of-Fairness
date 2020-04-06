@@ -1,4 +1,5 @@
-from src.data import load_german_dataset
+from src.data import load_german_dataset, to_dataframe
+from src.algorithms import baseline_svm
 
 """
 TODO:
@@ -17,3 +18,7 @@ with the different SVM setups for fitness calculation using chosen metrics
 """
 
 train, test = load_german_dataset()
+
+df, df_attributes = to_dataframe(train)
+
+baseline_svm(df, df_attributes)

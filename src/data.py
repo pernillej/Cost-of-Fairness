@@ -1,6 +1,16 @@
-from aif360.datasets import GermanDataset, StructuredDataset
+from aif360.datasets import GermanDataset, StructuredDataset, BinaryLabelDataset
 import numpy as np
 import pandas as pd
+
+
+def load_german_dataframe():
+    """
+    Collect the aif360 preprocessed German Credit Dataset as a Pandas Dataframe
+
+    :return: The German Credit Data in a Dataframe
+    """
+    dataset = load_german_dataset()
+    return to_dataframe(dataset, favorable_label=1., unfavorable_label=2.)  # Labels specific to German dataset
 
 
 def load_german_dataset():
@@ -16,14 +26,16 @@ def load_german_dataset():
         privileged_classes=[lambda x: x >= 25],  # age >= 25 is considered privileged
         features_to_drop=['personal_status', 'sex']  # Remove sex-related attributes
     )
-    return dataset.split([0.8], shuffle=True)
+    return dataset
 
 
-def to_dataframe(dataset):
+def to_dataframe(dataset, favorable_label=None, unfavorable_label=None):
     """
     Convert the ai360 data set into a Pandas Dataframe
 
     :param dataset: aif360 StructuredDataset type to convert into a dataframe
+    :param favorable_label: Favorable label value to add to attributes, in case of binary label. Default: None
+    :param unfavorable_label: Unfavorable label value to add to attributes, in case of binary label. Default: None
     :return: Tuple containing:
         - The converted dataframe
         - Dictionary of attributes with the following structure:
@@ -37,22 +49,49 @@ def to_dataframe(dataset):
             "unprivileged_protected_attributes": self.unprivileged_protected_attributes
           }
     """
-    return dataset.convert_to_dataframe()
+    df, attributes = dataset.convert_to_dataframe()
+
+    attributes["favorable_label"] = favorable_label
+    attributes["unfavorable_label"] = unfavorable_label
+
+    return df, attributes
 
 
-def from_dataframe(dataframe, attributes):
+def dataframe_to_dataset(dataframe, attributes):
     """
-    Convert Pandas Dataframe into aif360 StructuredDataset
+    Convert Pandas Dataframe into aif360 Dataset, either a BinaryLabelDataset or the base class StructuredDataset
 
     :param dataframe: The dataframe to convert
     :param attributes: Dictionary of attributes relating to the dataframe
-    :return: aif360 StructuredDataset type generated from the params
+    :return: aif360 Dataset type generated from the params
     """
-    dataset = StructuredDataset(df=dataframe, label_names=attributes["label_names"],
-                                protected_attribute_names=attributes["protected_attribute_names"],
-                                unprivileged_protected_attributes=attributes["unprivileged_protected_attributes"],
-                                privileged_protected_attributes=attributes["privileged_protected_attributes"])
+    if attributes["favorable_label"] and attributes["unfavorable_label"]:
+        dataset = BinaryLabelDataset(df=dataframe,
+                                     favorable_label=attributes["favorable_label"],
+                                     unfavorable_label=attributes["unfavorable_label"],
+                                     label_names=attributes["label_names"],
+                                     protected_attribute_names=attributes["protected_attribute_names"],
+                                     unprivileged_protected_attributes=attributes["unprivileged_protected_attributes"],
+                                     privileged_protected_attributes=attributes["privileged_protected_attributes"])
+    else:
+        dataset = StructuredDataset(df=dataframe, label_names=attributes["label_names"],
+                                    protected_attribute_names=attributes["protected_attribute_names"],
+                                    unprivileged_protected_attributes=attributes["unprivileged_protected_attributes"],
+                                    privileged_protected_attributes=attributes["privileged_protected_attributes"])
     return dataset
+
+
+def get_privileged_and_unprivileged_groups(attributes):
+    unprivileged = []
+    privileged = []
+    for i in range(len(attributes["protected_attribute_names"])):
+        unprivileged.append(
+            {attributes["protected_attribute_names"][i]: attributes["unprivileged_protected_attributes"][i][0]
+             })
+        privileged.append(
+            {attributes["protected_attribute_names"][i]: attributes["privileged_protected_attributes"][i][0]
+             })
+    return unprivileged, privileged
 
 
 def get_X_and_y(dataframe, label_name):

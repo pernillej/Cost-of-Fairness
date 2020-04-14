@@ -94,7 +94,11 @@ def get_privileged_and_unprivileged_groups(attributes):
     return unprivileged, privileged
 
 
-def get_X_and_y(dataframe, label_name):
-    X = dataframe.drop(label_name, axis=1)
-    y = dataframe[label_name]
-    return X, y
+def get_drop_features(features, selected_features):
+    drop_features = []
+    for i in range(len(features)):
+        if selected_features[i] == 1:
+            drop_features.append(features[i])
+    if len(drop_features) == 0:  # If no features in selected_features, include all features instead
+        drop_features = []
+    return drop_features

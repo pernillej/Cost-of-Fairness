@@ -1,4 +1,5 @@
 from src.experiments.baseline import baseline_experiment
+from src.plotter import plot
 
 """
 Done: 
@@ -12,4 +13,6 @@ TODO:
 6. Customize...
 """
 
-baseline_experiment()
+baseline_result = baseline_experiment()
+plot(baseline_result)
+

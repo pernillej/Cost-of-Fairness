@@ -4,6 +4,17 @@ import random
 
 
 def nsga2(pop_size, num_generations, chromosome_length, mutation_rate, crossover_rate, evaluation_algorithm):
+    """
+    Run the NSGA-II algorithm with the specified parameters.
+
+    :param pop_size: Number of chromosomes in the population
+    :param num_generations: Number of generations to run
+    :param chromosome_length: The length of the chromosomes (amount of bits)
+    :param mutation_rate: The rate of mutation
+    :param crossover_rate: The probability of crossover
+    :param evaluation_algorithm: The evaluation algorithm to be used to determine the fairness metrics
+    :return: The final best Pareto front after NSGA-II is finished
+    """
     population = create_population(pop_size, chromosome_length)
 
     for gen in range(num_generations):
@@ -25,13 +36,19 @@ def nsga2(pop_size, num_generations, chromosome_length, mutation_rate, crossover
 
 
 """
-Code below from (with updates and fixes): 
+Code below from (with updates, adaptations and fixes): 
 https://pythonhealthcare.org/2019/01/17/117-genetic-algorithms-2-a-multiple-objective-genetic-algorithm-nsga-ii/
-TODO: Rework
 """
 
 
 def get_final_front(population, evaluation_algorithm):
+    """
+    Get the final Pareto front from the final population
+
+    :param population: The final population of chromosomes
+    :param evaluation_algorithm: Evaluation algorithm to be used to determine the fairness metrics
+    :return: The final Pareto front
+    """
     population_fitness = get_population_fitness(population, evaluation_algorithm)
     population_ids = np.arange(population.shape[0]).astype(int)
     pareto_front = identify_pareto(population_fitness, population_ids)
@@ -42,9 +59,12 @@ def calculate_crowding_distances(scores):
     """
     Crowding is based on a vector for each individual
     All scores are normalised between low and high. For any one score, all
-    solutions are sorted in order low to high. Crowding for chromosome x
+    chromosomes are sorted in order low to high. Crowding for chromosome x
     for that score is the difference between the next highest and next
     lowest score. Total crowding value sums all crowding for all scores
+
+    :param scores: The fitness scores the calculate crowding distances from
+    :return: The crowding distances
     """
 
     population_size = len(scores[:, 0])
@@ -66,7 +86,6 @@ def calculate_crowding_distances(scores):
 
         # Sort each score (to calculate crowding between adjacent scores)
         sorted_scores = np.sort(normed_scores[:, col])
-
         sorted_scores_index = np.argsort(
             normed_scores[:, col])
 
@@ -90,9 +109,13 @@ def calculate_crowding_distances(scores):
 
 def tournament_selection(scores, number_to_select):
     """
-    This function selects a number of solutions based on tournament of
+    This function selects a number of chromosomes based on tournament of
     crowding distances. Two members of the population are picked at
     random. The one with the higher crowding distance is always picked
+
+    :param scores: The fitness scores for the population
+    :param number_to_select: Number of chromosomes to select using tournament selection
+    :return: Ids indicating which chromosomes are picked
     """
     population_ids = np.arange(scores.shape[0])
 
@@ -106,40 +129,35 @@ def tournament_selection(scores, number_to_select):
 
         population_size = population_ids.shape[0]
 
-        fighter1ID = random.randint(0, population_size - 1)
+        fighter1_id = random.randint(0, population_size - 1)
 
-        fighter2ID = random.randint(0, population_size - 1)
+        fighter2_id = random.randint(0, population_size - 1)
 
         # If fighter # 1 is better
-        if crowding_distances[fighter1ID] >= crowding_distances[
-            fighter2ID]:
+        if crowding_distances[fighter1_id] >= crowding_distances[fighter2_id]:
 
             # add solution to picked solutions array
-            picked_population_ids[i] = population_ids[
-                fighter1ID]
+            picked_population_ids[i] = population_ids[fighter1_id]
 
             # Add score to picked scores array
-            picked_scores[i, :] = scores[fighter1ID, :]
+            picked_scores[i, :] = scores[fighter1_id, :]
 
             # remove selected solution from available solutions
-            population_ids = np.delete(population_ids, (fighter1ID),
-                                       axis=0)
+            population_ids = np.delete(population_ids, fighter1_id, axis=0)
 
-            scores = np.delete(scores, (fighter1ID), axis=0)
+            scores = np.delete(scores, fighter1_id, axis=0)
 
-            crowding_distances = np.delete(crowding_distances, (fighter1ID),
-                                           axis=0)
+            crowding_distances = np.delete(crowding_distances, fighter1_id, axis=0)
         else:
-            picked_population_ids[i] = population_ids[fighter2ID]
+            picked_population_ids[i] = population_ids[fighter2_id]
 
-            picked_scores[i, :] = scores[fighter2ID, :]
+            picked_scores[i, :] = scores[fighter2_id, :]
 
-            population_ids = np.delete(population_ids, (fighter2ID), axis=0)
+            population_ids = np.delete(population_ids, fighter2_id, axis=0)
 
-            scores = np.delete(scores, (fighter2ID), axis=0)
+            scores = np.delete(scores, fighter2_id, axis=0)
 
-            crowding_distances = np.delete(
-                crowding_distances, (fighter2ID), axis=0)
+            crowding_distances = np.delete(crowding_distances, fighter2_id, axis=0)
 
     # Convert to integer
     picked_population_ids = np.asarray(picked_population_ids, dtype=int)
@@ -150,7 +168,11 @@ def tournament_selection(scores, number_to_select):
 def identify_pareto(scores, population_ids):
     """
     Identifies a single Pareto front, and returns the population IDs of
-    the selected solutions.
+    the selected chromosomes.
+
+    :param scores: Fitness scores to find a Pareto front from
+    :param population_ids: Ids for the population
+    :return: Ids for the selected chromosomes
     """
     population_size = scores.shape[0]
     # Create a starting list of items on the Pareto front
@@ -173,8 +195,13 @@ def identify_pareto(scores, population_ids):
 def select_population(population, scores, population_size):
     """
     As necessary repeats Pareto front selection to build a population within
-    defined size limits. Will reduce a Pareto front by applying crowding
+    defined size limit. Will reduce a Pareto front by applying crowding
     selection as necessary.
+
+    :param population: The population to reduce
+    :param scores: Fitness scores for the population
+    :param population_size: The desired size of the reduced population
+    :return: The reduced population of chromosomes
     """
     unselected_population_ids = np.arange(population.shape[0])
     all_population_ids = np.arange(population.shape[0])

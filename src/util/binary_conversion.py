@@ -1,6 +1,15 @@
 def from_binary_to_float_in_range(bits, exponent_length, exponent_range):
+    """
+    Convert from binary to float within a certain range.
+
+    :param bits: The list of bits to convert to a float
+    :param exponent_length: The amount of exponent bits
+    :param exponent_range: The range of the exponent
+    :return: Float withing desired range
+    """
     exponent_bits = bits[:exponent_length]
     mantissa_bits = bits[exponent_length:]
+
     # Calculate mantissa
     mantissa = 0
     for i, bit in enumerate(mantissa_bits):
@@ -8,6 +17,7 @@ def from_binary_to_float_in_range(bits, exponent_length, exponent_range):
         mantissa += bit*(2**ex)
     if exponent_bits.any():
         mantissa += 1
+
     # Calculate exponent and scale into desired range
     exponent_string = [*map(str, [*map(int, exponent_bits.tolist())])]
     exponent = int(''.join(exponent_string), 2)

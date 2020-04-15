@@ -4,6 +4,13 @@ from src.util.binary_conversion import from_binary_to_float_in_range
 
 
 def create_population(pop_size, chromosome_length):
+    """
+    Creates a population of chromosomes, where the chromosomes are arrays of bits of a desired length
+
+    :param pop_size: Amount of chromosomes to create
+    :param chromosome_length: The length of the chromosome bit arrays
+    :return: The population (a list) of chromosomes.
+    """
     population = []
     for i in range(pop_size):
         chromosome = np.zeros(chromosome_length)
@@ -15,7 +22,15 @@ def create_population(pop_size, chromosome_length):
 
 
 def crossover(parent1, parent2):
-    # Slice one parent into another at a random point, to generate 2 children
+    """
+    Perform crossover of 2 parent chromosomes.
+    Picks a random point to slice and combine the parents, and returns 2 children.
+    Each child contains opposite parts of the parent
+
+    :param parent1: The first parent to perform crossover with
+    :param parent2: The second parent to perform crossover with
+    :return: 2 child chromosomes
+    """
     chromosome_length = len(parent1)
     crossover_point = random.randint(1, chromosome_length - 1)
     child1 = np.hstack((parent1[0:crossover_point], parent2[crossover_point:]))
@@ -24,6 +39,12 @@ def crossover(parent1, parent2):
 
 
 def mutate(chromosome):
+    """
+    Perform mutation on a chromosome. Flips one random bit in the chromosome.
+
+    :param chromosome: The chromosome to mutate
+    :return: The mutated chromosome
+    """
     mutated_chromosome = chromosome
     bit_index = random.randint(0, len(chromosome) - 1)
     mutated_chromosome[bit_index] = 1 - chromosome[bit_index]
@@ -31,7 +52,15 @@ def mutate(chromosome):
 
 
 def generate_children(population, crossover_rate, mutation_rate):
-    new_population = []
+    """
+    Generate a children population from the parent population.
+
+    :param population: The parent population to generate children from
+    :param crossover_rate: The probability of crossover
+    :param mutation_rate: The rate of mutation
+    :return: List of children chromosomes
+    """
+    children = []
     pop_size = len(population)
 
     for i in range(int(pop_size/2)):
@@ -43,12 +72,19 @@ def generate_children(population, crossover_rate, mutation_rate):
             mutate(c1)
         if random.random() <= mutation_rate:
             mutate(c2)
-        new_population.append(c1)
-        new_population.append(c2)
-    return np.array(new_population)
+        children.append(c1)
+        children.append(c2)
+    return np.array(children)
 
 
 def get_population_fitness(population, evaluation_algorithm):
+    """
+    Calculate fitness scores for the population.
+
+    :param population: The population to calculate fitness scores on
+    :param evaluation_algorithm: The evaluation algorithm to be used to calculate fitness cores
+    :return: The fitness scores
+    """
     fitness_scores = np.zeros((population.shape[0], 2))
     for i in range(population.shape[0]):
         fitness = evaluation_algorithm(population[i])
@@ -57,17 +93,33 @@ def get_population_fitness(population, evaluation_algorithm):
 
 
 def get_C(chromosome):
-    # Make sure never 0 (aka all bits 0), in which case, make it the lowest possible number
+    """
+    Get the C value from the chromosome. Aka, the first 15 bits of the chromosome, decoded to a float
+
+    :param chromosome: Chromosome to get C value from
+    :return: C value as a float
+    """
     C = from_binary_to_float_in_range(chromosome[:14], 5, [-16, 16])
     return C
 
 
 def get_gamma(chromosome):
-    # Make sure never 0 (aka all bits 0), in which case, make it the lowest possible number
+    """
+    Get the gamma value from the chromosome. Aka, the second 15 bits of the chromosome, decoded to a float
+
+    :param chromosome: Chromosome to get gamma value from
+    :return: gamma value as a float
+    """
     gamma = from_binary_to_float_in_range(chromosome[15:29], 4, [-10, 3])
     return gamma
 
 
 def get_selected_features(chromosome):
-    # Return selected features part of chromosome
+    """
+    Get selected features bits from the chromosome. Aka the final bits of the chromosome, after the C and gamma bits
+
+    :param chromosome: Chromosome to get selected features from
+    :return: List of selected features, as a list of bits indicating if a
+             feature corresponding to the index is selected or not
+    """
     return chromosome[30:]

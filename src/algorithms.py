@@ -3,10 +3,33 @@ from sklearn.model_selection import KFold
 
 
 def baseline_svm(data, metrics, data_attributes, C, gamma, drop_features):
+    """
+    Baseline SVM with no mitigation added.
+
+    :param data: The dataset to run svm on
+    :param metrics: The metrics to calculate
+    :param data_attributes: Attributes describing the dataset
+    :param C: The C value to be used in SVM
+    :param gamma: The gamma value to be used in SVM
+    :param drop_features: The features to drop in SVM
+    :return: Tuple with the scores for the metrics: (accuracy_score, fairness_score)
+    """
     return kfold_svm(data, metrics, data_attributes, C, gamma, drop_features)
 
 
 def kfold_svm(data, metrics, data_attributes, C, gamma, drop_features, k=5):
+    """
+    Central SVM algorithm with kfold cross validation.
+
+    :param data: The dataset to run kfold svm on
+    :param metrics: The metrics to calculate
+    :param data_attributes: Attributes describing the dataset
+    :param C: The C value to be used in SVM
+    :param gamma: The gamma value to be used in SVM
+    :param drop_features: The features to drop in SVM
+    :param k: Amount of folds. (Default=5)
+    :return: Tuple with the scores for the metrics: (accuracy_score, fairness_score)
+    """
     kf = KFold(n_splits=k, shuffle=True)
     accuracy_scores = []
     fairness_scores = []
@@ -32,3 +55,8 @@ def kfold_svm(data, metrics, data_attributes, C, gamma, drop_features, k=5):
     avg_accuracy = sum(accuracy_scores)/len(accuracy_scores)
     avg_fairness = sum(fairness_scores)/len(fairness_scores)
     return avg_accuracy, avg_fairness
+
+
+"""
+Add more algorithms with mitigation methods here:
+"""

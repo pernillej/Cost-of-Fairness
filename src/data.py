@@ -82,6 +82,12 @@ def dataframe_to_dataset(dataframe, attributes):
 
 
 def get_privileged_and_unprivileged_groups(attributes):
+    """
+    Get privileged and unprivileged groups encoded as list(dict), to fit aif360 formating.
+
+    :param attributes: Data set attributes to generate groups from
+    :return: Privileged and unprivileged groups encoded as list(dict)
+    """
     unprivileged = []
     privileged = []
     for i in range(len(attributes["protected_attribute_names"])):
@@ -95,6 +101,13 @@ def get_privileged_and_unprivileged_groups(attributes):
 
 
 def get_drop_features(features, selected_features):
+    """
+    Get features to drop, as a list of strings.
+
+    :param features: List of all features
+    :param selected_features: Bit map of which features to drop, and which to keep
+    :return:
+    """
     drop_features = []
     for i in range(len(features)):
         if selected_features[i] == 1:

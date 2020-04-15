@@ -1,10 +1,17 @@
 from sklearn.metrics import roc_auc_score
-from aif360.metrics import BinaryLabelDatasetMetric, ClassificationMetric
+from aif360.metrics import ClassificationMetric
 from aif360.datasets import BinaryLabelDataset
 from src.data import dataframe_to_dataset, get_privileged_and_unprivileged_groups
 
 
 def auc(y_true, y_pred):
+    """
+    Get the AUC score for the predictions
+
+    :param y_true: The ground truth labels
+    :param y_pred: The predicted labels
+    :return: The AUC score
+    """
     y_true = preprocess_y_true(y_true)
     y_pred = preprocess_y_pred(y_pred)
     return roc_auc_score(y_true, y_pred)
@@ -14,18 +21,18 @@ def statistical_parity(X_test_orig, y_pred, data_attributes):
     """
     Calculate statistical parity score: 1 - |Statistical Parity Difference|
 
-    :param X_test_orig: Dataset used to generate predictions, including the label
-    :param y_pred:  Predictions
+    :param X_test_orig: Dataset used to generate predictions, including the original label
+    :param y_pred: Predictions
     :param data_attributes: Attributes describing the dataset
     :return: Statistical parity score
     """
-    pred_df = X_test_orig.assign(credit=y_pred)
-    pred_data = dataframe_to_dataset(pred_df, data_attributes)
     orig_data = dataframe_to_dataset(X_test_orig, data_attributes)
+
+    pred_df = X_test_orig.assign(credit=y_pred)  # Replace labels with predicted labels
+    pred_data = dataframe_to_dataset(pred_df, data_attributes)
     if type(pred_data) != BinaryLabelDataset and type(orig_data) != BinaryLabelDataset:
         raise Exception('Invalid datasets. Must be BinaryLabelDataset')
     unprivileged, privileged = get_privileged_and_unprivileged_groups(data_attributes)
-    # data_metric = BinaryLabelDatasetMetric(pred_data, unprivileged_groups=unprivileged, privileged_groups=privileged)
     data_metric = ClassificationMetric(orig_data, pred_data,
                                        unprivileged_groups=unprivileged,
                                        privileged_groups=privileged)
@@ -34,6 +41,14 @@ def statistical_parity(X_test_orig, y_pred, data_attributes):
 
 
 def theil_index(X_test_orig, y_pred, data_attributes):
+    """
+    Calculate Theil Index score: 1 - |Theil Index|
+
+    :param X_test_orig: Dataset used to generate predictions, including the original label
+    :param y_pred: Predictions
+    :param data_attributes: Attributes describing the dataset
+    :return:
+    """
     pred_df = X_test_orig.assign(credit=y_pred)
     pred_data = dataframe_to_dataset(pred_df, data_attributes)
     orig_data = dataframe_to_dataset(X_test_orig, data_attributes)
@@ -46,6 +61,16 @@ def theil_index(X_test_orig, y_pred, data_attributes):
                                        privileged_groups=privileged)
     # Must have abs() because metric can be both + and - ??
     return 1 - data_metric.theil_index()
+
+
+"""
+Add more metrics here:
+"""
+
+
+"""
+Utils
+"""
 
 
 def preprocess_y_true(y_true):

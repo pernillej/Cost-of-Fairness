@@ -17,7 +17,7 @@ def kfold_svm(data, metrics, data_attributes, C, gamma, drop_features, k=5):
         X_orig = train.drop('credit', axis=1)
         X = X_orig.drop(drop_features, axis=1)
         y = train['credit']
-        X_test_orig = test.drop('credit', axis=1)  # Keep for fairness metric calculations
+        X_test_orig = test.drop('credit', axis=1)
         X_test = X_test_orig.drop(drop_features, axis=1)
         y_test = test['credit']
 
@@ -27,7 +27,7 @@ def kfold_svm(data, metrics, data_attributes, C, gamma, drop_features, k=5):
         y_pred = clf.predict(X_test)
         # score = clf.score(X_test, y_test)  # Basic mean average score included in svc class
         accuracy_scores.append(metrics['accuracy'](y_test, y_prob_pred))
-        fairness_scores.append(metrics['fairness'](X_test_orig, y_pred, data_attributes))
+        fairness_scores.append(metrics['fairness'](test, y_pred, data_attributes))
 
     avg_accuracy = sum(accuracy_scores)/len(accuracy_scores)
     avg_fairness = sum(fairness_scores)/len(fairness_scores)

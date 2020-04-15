@@ -1,14 +1,14 @@
 from src.nsga2.nsga2 import nsga2
 from src.nsga2.population import get_C, get_gamma, get_selected_features
-from src.metrics import auc, statistical_parity
+from src.metrics import auc, statistical_parity, theil_index
 from src.data import load_german_dataframe, get_drop_features
 from src.algorithms import baseline_svm
 
-NUM_GENERATIONS = 10
-POPULATION_SIZE = 10
+NUM_GENERATIONS = 100
+POPULATION_SIZE = 50
 MUTATION_RATE = 0.05
 CROSSOVER_RATE = 0.7
-CHROMOSOME_LENGTH = 30 + 57
+CHROMOSOME_LENGTH = 30 + 57  # 15 each for C and gamma, plus 57 for the number of features in german dataset
 METRICS = {
         'accuracy': auc,
         'fairness': statistical_parity
@@ -26,22 +26,21 @@ def baseline_experiment():
 
 
 def evaluation_function(chromosome):
-    if str(chromosome) in FITNESS:
-        return FITNESS[str(chromosome)]
+    if str(chromosome) in FITNESS_SCORES:
+        return FITNESS_SCORES[str(chromosome)]
     else:
-        # TODO: extract C, gamma properly
         C = get_C(chromosome)
         gamma = get_gamma(chromosome)
         selected_features = get_selected_features(chromosome)
         df, df_attributes = load_german_dataframe()
         drop_features = get_drop_features(df_attributes['feature_names'], selected_features)
-        accuracy_score, fairness_score = baseline_svm(df, METRICS, df_attributes, C=1, gamma='scale',
+        accuracy_score, fairness_score = baseline_svm(df, METRICS, df_attributes, C=C, gamma=gamma,
                                                       drop_features=drop_features)
-        FITNESS[str(chromosome)] = [accuracy_score, fairness_score]
+        FITNESS_SCORES[str(chromosome)] = [accuracy_score, fairness_score]
         return [accuracy_score, fairness_score]
 
 
 """ 
 Collects scores already calculated to remove unnecessary burden of recalculating for identical chromosomes
 """
-FITNESS = {}
+FITNESS_SCORES = {}

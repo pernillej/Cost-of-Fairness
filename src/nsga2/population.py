@@ -1,5 +1,6 @@
 import numpy as np
 import random
+from src.util.binary_conversion import from_binary_to_float_in_range
 
 
 def create_population(pop_size, chromosome_length):
@@ -56,15 +57,15 @@ def get_population_fitness(population, evaluation_algorithm):
 
 
 def get_C(chromosome):
-    # TODO: Return decoded C part of chromosome
     # Make sure never 0 (aka all bits 0), in which case, make it the lowest possible number
-    return chromosome[:14]
+    C = from_binary_to_float_in_range(chromosome[:14], 5, [-16, 16])
+    return C
 
 
 def get_gamma(chromosome):
-    # TODO: Return decoded gamma part of chromosome
     # Make sure never 0 (aka all bits 0), in which case, make it the lowest possible number
-    return chromosome[15:29]
+    gamma = from_binary_to_float_in_range(chromosome[15:29], 4, [-10, 3])
+    return gamma
 
 
 def get_selected_features(chromosome):

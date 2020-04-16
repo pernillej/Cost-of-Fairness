@@ -1,12 +1,30 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
 
-def plot(scores):
+def plot_result(result, label, show=False):
     # TODO: Update to proper plotting
+    scores = sort_results_for_plotting(list(result.values()))
+    scores = np.array(scores)
     x = scores[:, 0]
     y = scores[:, 1]
-    plt.xlabel('Accuracy objective')
-    plt.ylabel('Fairness objective')
+    line, = plt.plot(x, y, '-o', label=label)
+    if show:
+        plt.show()
+    return line
 
-    plt.scatter(x, y)
+
+def plot_results(result_summaries):
+    x_label = result_summaries[0]["metrics"]["accuracy"]
+    y_label = "1 - " + result_summaries[0]["metrics"]["fairness"]
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    lines = []
+    for result_summary in result_summaries:
+        lines.append(plot_result(result_summary["result"], result_summary["name"]))
+    plt.legend(handles=lines)
     plt.show()
+
+
+def sort_results_for_plotting(scores):
+    return sorted(scores, key=lambda x: x[1])

@@ -1,11 +1,12 @@
 from src.nsga2.nsga2 import nsga2
 from src.nsga2.population import get_C, get_gamma, get_selected_features
-from src.metrics import auc, statistical_parity, theil_index
+from src.metrics import auc, statistical_parity, theil_index, function_name_to_string
 from src.data import load_german_dataframe, get_drop_features
 from src.algorithms import baseline_svm
+from src.util.filehandler import write_result_to_file
 
-NUM_GENERATIONS = 100
-POPULATION_SIZE = 50
+NUM_GENERATIONS = 2
+POPULATION_SIZE = 5
 MUTATION_RATE = 0.05
 CROSSOVER_RATE = 0.7
 CHROMOSOME_LENGTH = 30 + 57  # 15 each for C and gamma, plus 57 for the number of features in german data set
@@ -27,6 +28,17 @@ def baseline_experiment():
                    crossover_rate=CROSSOVER_RATE,
                    mutation_rate=MUTATION_RATE,
                    evaluation_algorithm=evaluation_function)
+
+    # Summary to write to file
+    result_summary = {'name': 'SVM',
+                      'result': result,
+                      'metrics': {'accuracy': function_name_to_string(METRICS['accuracy']),
+                                  'fairness': function_name_to_string(METRICS['fairness'])},
+                      'nsga2_parameters': {'num_generations': NUM_GENERATIONS, 'population_size': POPULATION_SIZE,
+                                           'crossover_rate': CROSSOVER_RATE, 'mutation_rate': MUTATION_RATE,
+                                           'chromosome_length': CHROMOSOME_LENGTH}}
+    write_result_to_file(result_summary, "baseline_svm")
+    # Return only the result, not the summary
     return result
 
 

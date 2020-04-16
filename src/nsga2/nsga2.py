@@ -47,12 +47,15 @@ def get_final_front(population, evaluation_algorithm):
 
     :param population: The final population of chromosomes
     :param evaluation_algorithm: Evaluation algorithm to be used to determine the fairness metrics
-    :return: The final Pareto front
+    :return: The final Pareto front as a dictionary, with the chromosomes ase keys
     """
     population_fitness = get_population_fitness(population, evaluation_algorithm)
     population_ids = np.arange(population.shape[0]).astype(int)
     pareto_front = identify_pareto(population_fitness, population_ids)
-    return population_fitness[pareto_front]
+    result = {}
+    for i in pareto_front:
+        result[str(population[i].tolist()).replace('\n', '')] = population_fitness[i].tolist()
+    return result
 
 
 def calculate_crowding_distances(scores):

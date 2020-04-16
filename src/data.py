@@ -117,6 +117,6 @@ def get_drop_features(features, selected_features):
     for i in range(len(features)):
         if selected_features[i] == 1:
             drop_features.append(features[i])
-    if len(drop_features) == 0:  # If no features in selected_features, include all features instead
+    if len(drop_features) == len(selected_features):  # If no features in selected_features, include all features
         drop_features = []
     return drop_features

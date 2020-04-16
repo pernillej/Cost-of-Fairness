@@ -94,3 +94,18 @@ def preprocess_y_pred(y_pred):
     :return: Processed predictions
     """
     return y_pred[:, 1]
+
+
+def function_name_to_string(func):
+    """
+    Produces a readable string from a metric function. Update when adding more metrics.
+
+    :param func: The metric function to get a readable string from
+    :return: String with name of metric
+    """
+    if func == auc:
+        return "AUC"
+    if func == statistical_parity:
+        return "Statistical Parity Difference"
+    if func == theil_index:
+        return "Theil Index"

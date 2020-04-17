@@ -97,9 +97,9 @@ def get_C(chromosome):
     Get the C value from the chromosome. Aka, the first 15 bits of the chromosome, decoded to a float
 
     :param chromosome: Chromosome to get C value from
-    :return: C value as a float
+    :return: C value as a float in range [1/2^16, 2^16]
     """
-    C = from_binary_to_float_in_range(chromosome[:14], 5, [-16, 16])
+    C = from_binary_to_float_in_range(chromosome[:15], 5, [-16, 16])
     return C
 
 
@@ -108,18 +108,35 @@ def get_gamma(chromosome):
     Get the gamma value from the chromosome. Aka, the second 15 bits of the chromosome, decoded to a float
 
     :param chromosome: Chromosome to get gamma value from
-    :return: gamma value as a float
+    :return: gamma value as a float in range [1/2^10, 2^3]
     """
     gamma = from_binary_to_float_in_range(chromosome[15:29], 4, [-10, 3])
     return gamma
 
 
-def get_selected_features(chromosome):
+def get_selected_features(chromosome, start_index):
     """
     Get selected features bits from the chromosome. Aka the final bits of the chromosome, after the C and gamma bits
 
     :param chromosome: Chromosome to get selected features from
+    :param start_index: Index where selected features bits start
     :return: List of selected features, as a list of bits indicating if a
              feature corresponding to the index is selected or not
     """
-    return chromosome[30:]
+    return chromosome[start_index:]
+
+
+def get_repair_level(chromosome):
+    rl = from_binary_to_float_in_range(chromosome[30:35], 2, [-4, 0])
+    return rl
+
+
+def get_tau(chromosome):
+    """
+    Get the tau parameter for the Meta-Fair algorithm
+
+    :param chromosome: Chromosome to get tau value from
+    :return: tau value as a float in range [0,1]
+    """
+    tau = from_binary_to_float_in_range(chromosome[:15], 4, [-16, 0])
+    return tau

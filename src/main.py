@@ -1,7 +1,11 @@
 from src.experiments.baseline import baseline_experiment
 from src.experiments.reweighing import reweighing_experiment
+from src.experiments.metafair import metafair_experiment
+from src.experiments.roc import roc_experiment
+from src.experiments.dir import dir_experiment
 from src.util.plotter import plot_results
 from src.util.filehandler import read_result_from_file
+from src.data import load_compas_dataframe
 
 """
 Done: 
@@ -18,8 +22,11 @@ TODO:
 
 
 def run_experiment():
-    # result = baseline_experiment()
-    result = reweighing_experiment()
+    result = baseline_experiment()
+    # result = reweighing_experiment()
+    # result = metafair_experiment() NOT WORKING
+    # result = roc_experiment() NOT WORKING
+    # result = dir_experiment()
     print('Results: ' + str(result))
 
 

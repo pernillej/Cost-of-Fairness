@@ -1,7 +1,8 @@
 from src.nsga2.nsga2 import nsga2
 from src.nsga2.population import get_C, get_gamma, get_selected_features
-from src.metrics import auc, statistical_parity, theil_index, function_name_to_string
-from src.data import load_german_dataframe, get_drop_features
+from src.metrics import auc, statistical_parity, theil_index, disparate_impact, equal_opportunity, average_odds, \
+    function_name_to_string
+from src.data import load_german_dataframe, load_compas_dataframe, get_drop_features, dataframe_to_dataset
 from src.algorithms import baseline_svm
 from src.util.filehandler import write_result_to_file
 
@@ -10,6 +11,7 @@ POPULATION_SIZE = 5
 MUTATION_RATE = 0.05
 CROSSOVER_RATE = 0.7
 CHROMOSOME_LENGTH = 30 + 57  # 15 each for C and gamma, plus 57 for the number of features in german data set
+# CHROMOSOME_LENGTH = 30 + 400  # plus 57 for the number of features in compas data set
 METRICS = {
     'accuracy': auc,
     'fairness': statistical_parity
@@ -58,10 +60,11 @@ def evaluation_function(chromosome):
     else:
         C = get_C(chromosome)
         gamma = get_gamma(chromosome)
-        selected_features = get_selected_features(chromosome)
+        selected_features = get_selected_features(chromosome, 30)
         drop_features = get_drop_features(DF_ATTRIBUTES['feature_names'], selected_features)
         accuracy_score, fairness_score = baseline_svm(DF, METRICS, DF_ATTRIBUTES, C=C, gamma=gamma,
-                                                      drop_features=drop_features)
+                                                      drop_features=drop_features,
+                                                      label_name=DF_ATTRIBUTES["label_names"][0])
         FITNESS_SCORES[str(chromosome)] = [accuracy_score, fairness_score]
         return [accuracy_score, fairness_score]
 

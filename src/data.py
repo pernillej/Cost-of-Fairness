@@ -1,4 +1,4 @@
-from aif360.datasets import GermanDataset, StructuredDataset, BinaryLabelDataset
+from aif360.datasets import GermanDataset, CompasDataset, StructuredDataset, BinaryLabelDataset
 import numpy as np
 import pandas as pd
 
@@ -7,10 +7,20 @@ def load_german_dataframe():
     """
     Collect the aif360 preprocessed German Credit Dataset as a Pandas Dataframe
 
-    :return: The German Credit Data in a Dataframe
+    :return: The German Credit Data in a Dataframe, and the data attributes
     """
     dataset = load_german_dataset()
     return to_dataframe(dataset, favorable_label=1., unfavorable_label=2.)  # Labels specific to German dataset
+
+
+def load_compas_dataframe():
+    """
+    Collect the aif360 preprocessed Compas Dataset as a Pandas Dataframe
+
+    :return: The Compas Data in a dataframe, and the data attributes
+    """
+    dataset = load_compas_dataset()
+    return to_dataframe(dataset, favorable_label=0., unfavorable_label=1.)
 
 
 def load_german_dataset():
@@ -29,9 +39,20 @@ def load_german_dataset():
     return dataset
 
 
-"""
-Add more dataset here
-"""
+def load_compas_dataset():
+    """
+    Collect the aif360 preprocessed Compas Data Set.
+    Assigns 'race' as the protected attribute with Caucasian considered privileged.
+    Sex-related attributes are removed (the other option for privileged attribute)
+
+    :return: The Compas Dataset
+    """
+    dataset = CompasDataset(
+        protected_attribute_names=['race'],
+        privileged_classes=[['Caucasian']],
+        features_to_drop=['sex']
+    )
+    return dataset
 
 
 def to_dataframe(dataset, favorable_label=None, unfavorable_label=None):
@@ -73,7 +94,7 @@ def dataframe_to_dataset(dataframe, attributes, sample_weights_column_name=None)
     :param sample_weights_column_name: Column name in df corresponding to instance/sample weights
     :return: aif360 Dataset type generated from the params
     """
-    if attributes["favorable_label"] and attributes["unfavorable_label"]:
+    if attributes["favorable_label"] or attributes["unfavorable_label"]:
         dataset = BinaryLabelDataset(df=dataframe,
                                      favorable_label=attributes["favorable_label"],
                                      unfavorable_label=attributes["unfavorable_label"],

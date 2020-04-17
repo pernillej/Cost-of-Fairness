@@ -29,8 +29,9 @@ def statistical_parity(X_test_orig, y_pred, data_attributes, sample_weights_colu
     """
     orig_data = dataframe_to_dataset(X_test_orig, data_attributes,
                                      sample_weights_column_name=sample_weights_column_name)
-
-    pred_df = X_test_orig.assign(credit=y_pred)  # Replace labels with predicted labels
+    # Replace labels with predicted labels
+    pred_df = X_test_orig.drop(data_attributes["label_names"][0], axis=1)
+    pred_df[data_attributes["label_names"][0]] = y_pred
     pred_data = dataframe_to_dataset(pred_df, data_attributes, sample_weights_column_name=sample_weights_column_name)
     if type(pred_data) != BinaryLabelDataset and type(orig_data) != BinaryLabelDataset:
         raise Exception('Invalid datasets. Must be BinaryLabelDataset')
@@ -59,7 +60,9 @@ def theil_index(X_test_orig, y_pred, data_attributes, sample_weights_column_name
     orig_data = dataframe_to_dataset(X_test_orig, data_attributes,
                                      sample_weights_column_name=sample_weights_column_name)
 
-    pred_df = X_test_orig.assign(credit=y_pred)
+    # Replace labels with predicted labels
+    pred_df = X_test_orig.drop(data_attributes["label_names"][0], axis=1)
+    pred_df[data_attributes["label_names"][0]] = y_pred
     pred_data = dataframe_to_dataset(pred_df, data_attributes, sample_weights_column_name=sample_weights_column_name)
     if type(pred_data) != BinaryLabelDataset and type(orig_data) != BinaryLabelDataset:
         raise Exception('Invalid datasets. Must be BinaryLabelDataset')
@@ -68,17 +71,75 @@ def theil_index(X_test_orig, y_pred, data_attributes, sample_weights_column_name
                                                                           "unprivileged_protected_attributes"],
                                                                       data_attributes[
                                                                           "privileged_protected_attributes"])
-    # data_metric = BinaryLabelDatasetMetric(pred_data, unprivileged_groups=unprivileged, privileged_groups=privileged)
     data_metric = ClassificationMetric(orig_data, pred_data,
                                        unprivileged_groups=unprivileged,
                                        privileged_groups=privileged)
-    # Must have abs() because metric can be both + and - ??
     return 1 - data_metric.theil_index()
 
 
-"""
-Add more metrics here:
-"""
+def equal_opportunity(X_test_orig, y_pred, data_attributes, sample_weights_column_name=None):
+    orig_data = dataframe_to_dataset(X_test_orig, data_attributes,
+                                     sample_weights_column_name=sample_weights_column_name)
+
+    # Replace labels with predicted labels
+    pred_df = X_test_orig.drop(data_attributes["label_names"][0], axis=1)
+    pred_df[data_attributes["label_names"][0]] = y_pred
+    pred_data = dataframe_to_dataset(pred_df, data_attributes, sample_weights_column_name=sample_weights_column_name)
+    if type(pred_data) != BinaryLabelDataset and type(orig_data) != BinaryLabelDataset:
+        raise Exception('Invalid datasets. Must be BinaryLabelDataset')
+    unprivileged, privileged = get_privileged_and_unprivileged_groups(data_attributes["protected_attribute_names"],
+                                                                      data_attributes[
+                                                                          "unprivileged_protected_attributes"],
+                                                                      data_attributes[
+                                                                          "privileged_protected_attributes"])
+    data_metric = ClassificationMetric(orig_data, pred_data,
+                                       unprivileged_groups=unprivileged,
+                                       privileged_groups=privileged)
+    # Must have abs() because metric can be both + and -
+    return 1 - abs(data_metric.equal_opportunity_difference())
+
+
+def disparate_impact(X_test_orig, y_pred, data_attributes, sample_weights_column_name=None):
+    orig_data = dataframe_to_dataset(X_test_orig, data_attributes,
+                                     sample_weights_column_name=sample_weights_column_name)
+
+    # Replace labels with predicted labels
+    pred_df = X_test_orig.drop(data_attributes["label_names"][0], axis=1)
+    pred_df[data_attributes["label_names"][0]] = y_pred
+    pred_data = dataframe_to_dataset(pred_df, data_attributes, sample_weights_column_name=sample_weights_column_name)
+    if type(pred_data) != BinaryLabelDataset and type(orig_data) != BinaryLabelDataset:
+        raise Exception('Invalid datasets. Must be BinaryLabelDataset')
+    unprivileged, privileged = get_privileged_and_unprivileged_groups(data_attributes["protected_attribute_names"],
+                                                                      data_attributes[
+                                                                          "unprivileged_protected_attributes"],
+                                                                      data_attributes[
+                                                                          "privileged_protected_attributes"])
+    data_metric = ClassificationMetric(orig_data, pred_data,
+                                       unprivileged_groups=unprivileged,
+                                       privileged_groups=privileged)
+    return data_metric.disparate_impact()
+
+
+def average_odds(X_test_orig, y_pred, data_attributes, sample_weights_column_name=None):
+    orig_data = dataframe_to_dataset(X_test_orig, data_attributes,
+                                     sample_weights_column_name=sample_weights_column_name)
+
+    # Replace labels with predicted labels
+    pred_df = X_test_orig.drop(data_attributes["label_names"][0], axis=1)
+    pred_df[data_attributes["label_names"][0]] = y_pred
+    pred_data = dataframe_to_dataset(pred_df, data_attributes, sample_weights_column_name=sample_weights_column_name)
+    if type(pred_data) != BinaryLabelDataset and type(orig_data) != BinaryLabelDataset:
+        raise Exception('Invalid datasets. Must be BinaryLabelDataset')
+    unprivileged, privileged = get_privileged_and_unprivileged_groups(data_attributes["protected_attribute_names"],
+                                                                      data_attributes[
+                                                                          "unprivileged_protected_attributes"],
+                                                                      data_attributes[
+                                                                          "privileged_protected_attributes"])
+    data_metric = ClassificationMetric(orig_data, pred_data,
+                                       unprivileged_groups=unprivileged,
+                                       privileged_groups=privileged)
+    # Must have abs() because metric can be both + and -
+    return 1 - abs(data_metric.average_odds_difference())
 
 
 """
@@ -106,7 +167,10 @@ def preprocess_y_pred(y_pred):
     :param y_pred: Predictions to preprocess
     :return: Processed predictions
     """
-    return y_pred[:, 1]
+    if len(y_pred[0]) > 1:
+        return y_pred[:, 1]
+
+    return y_pred
 
 
 def function_name_to_string(func):
@@ -122,3 +186,9 @@ def function_name_to_string(func):
         return "Statistical Parity Difference"
     if func == theil_index:
         return "Theil Index"
+    if func == equal_opportunity:
+        return "Equal Opportunity Difference"
+    if func == disparate_impact:
+        return "Disparate Impact"
+    if func == average_odds:
+        return "Average Odds Difference"

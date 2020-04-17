@@ -17,22 +17,28 @@ def auc(y_true, y_pred):
     return roc_auc_score(y_true, y_pred)
 
 
-def statistical_parity(X_test_orig, y_pred, data_attributes):
+def statistical_parity(X_test_orig, y_pred, data_attributes, sample_weights_column_name=None):
     """
     Calculate statistical parity score: 1 - |Statistical Parity Difference|
 
     :param X_test_orig: Dataset used to generate predictions, including the original label
     :param y_pred: Predictions
     :param data_attributes: Attributes describing the dataset
+    :param sample_weights_column_name: Column name in df corresponding to instance/sample weights
     :return: Statistical parity score
     """
-    orig_data = dataframe_to_dataset(X_test_orig, data_attributes)
+    orig_data = dataframe_to_dataset(X_test_orig, data_attributes,
+                                     sample_weights_column_name=sample_weights_column_name)
 
     pred_df = X_test_orig.assign(credit=y_pred)  # Replace labels with predicted labels
-    pred_data = dataframe_to_dataset(pred_df, data_attributes)
+    pred_data = dataframe_to_dataset(pred_df, data_attributes, sample_weights_column_name=sample_weights_column_name)
     if type(pred_data) != BinaryLabelDataset and type(orig_data) != BinaryLabelDataset:
         raise Exception('Invalid datasets. Must be BinaryLabelDataset')
-    unprivileged, privileged = get_privileged_and_unprivileged_groups(data_attributes)
+    unprivileged, privileged = get_privileged_and_unprivileged_groups(data_attributes["protected_attribute_names"],
+                                                                      data_attributes[
+                                                                          "unprivileged_protected_attributes"],
+                                                                      data_attributes[
+                                                                          "privileged_protected_attributes"])
     data_metric = ClassificationMetric(orig_data, pred_data,
                                        unprivileged_groups=unprivileged,
                                        privileged_groups=privileged)
@@ -40,21 +46,28 @@ def statistical_parity(X_test_orig, y_pred, data_attributes):
     return 1 - abs(data_metric.statistical_parity_difference())
 
 
-def theil_index(X_test_orig, y_pred, data_attributes):
+def theil_index(X_test_orig, y_pred, data_attributes, sample_weights_column_name=None):
     """
     Calculate Theil Index score: 1 - |Theil Index|
 
     :param X_test_orig: Dataset used to generate predictions, including the original label
     :param y_pred: Predictions
     :param data_attributes: Attributes describing the dataset
+    :param sample_weights_column_name: Column name in df corresponding to instance/sample weights
     :return:
     """
+    orig_data = dataframe_to_dataset(X_test_orig, data_attributes,
+                                     sample_weights_column_name=sample_weights_column_name)
+
     pred_df = X_test_orig.assign(credit=y_pred)
-    pred_data = dataframe_to_dataset(pred_df, data_attributes)
-    orig_data = dataframe_to_dataset(X_test_orig, data_attributes)
+    pred_data = dataframe_to_dataset(pred_df, data_attributes, sample_weights_column_name=sample_weights_column_name)
     if type(pred_data) != BinaryLabelDataset and type(orig_data) != BinaryLabelDataset:
         raise Exception('Invalid datasets. Must be BinaryLabelDataset')
-    unprivileged, privileged = get_privileged_and_unprivileged_groups(data_attributes)
+    unprivileged, privileged = get_privileged_and_unprivileged_groups(data_attributes["protected_attribute_names"],
+                                                                      data_attributes[
+                                                                          "unprivileged_protected_attributes"],
+                                                                      data_attributes[
+                                                                          "privileged_protected_attributes"])
     # data_metric = BinaryLabelDatasetMetric(pred_data, unprivileged_groups=unprivileged, privileged_groups=privileged)
     data_metric = ClassificationMetric(orig_data, pred_data,
                                        unprivileged_groups=unprivileged,

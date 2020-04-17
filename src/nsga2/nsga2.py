@@ -179,7 +179,7 @@ def identify_pareto(scores, population_ids):
     """
     population_size = scores.shape[0]
     # Create a starting list of items on the Pareto front
-    # All items start off as being labelled as on the Parteo front
+    # All items start off as being labelled as on the Pareto front
     pareto_front = np.ones(population_size, dtype=bool)
     # Loop through each item. This will then be compared with all other items
     for i in range(population_size):

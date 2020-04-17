@@ -51,7 +51,9 @@ def to_dataframe(dataset, favorable_label=None, unfavorable_label=None):
             "instance_names": self.instance_names,
             "instance_weights": self.instance_weights,
             "privileged_protected_attributes": self.privileged_protected_attributes,
-            "unprivileged_protected_attributes": self.unprivileged_protected_attributes
+            "unprivileged_protected_attributes": self.unprivileged_protected_attributes,
+            "favorable_label": The favorable label,
+            "unfavorable_label": The unfavorable label
           }
     """
     df, attributes = dataset.convert_to_dataframe()
@@ -62,12 +64,13 @@ def to_dataframe(dataset, favorable_label=None, unfavorable_label=None):
     return df, attributes
 
 
-def dataframe_to_dataset(dataframe, attributes):
+def dataframe_to_dataset(dataframe, attributes, sample_weights_column_name=None):
     """
     Convert Pandas Dataframe into aif360 Dataset, either a BinaryLabelDataset or the base class StructuredDataset
 
     :param dataframe: The dataframe to convert
     :param attributes: Dictionary of attributes relating to the dataframe
+    :param sample_weights_column_name: Column name in df corresponding to instance/sample weights
     :return: aif360 Dataset type generated from the params
     """
     if attributes["favorable_label"] and attributes["unfavorable_label"]:
@@ -77,30 +80,36 @@ def dataframe_to_dataset(dataframe, attributes):
                                      label_names=attributes["label_names"],
                                      protected_attribute_names=attributes["protected_attribute_names"],
                                      unprivileged_protected_attributes=attributes["unprivileged_protected_attributes"],
-                                     privileged_protected_attributes=attributes["privileged_protected_attributes"])
+                                     privileged_protected_attributes=attributes["privileged_protected_attributes"],
+                                     instance_weights_name=sample_weights_column_name)
     else:
         dataset = StructuredDataset(df=dataframe, label_names=attributes["label_names"],
                                     protected_attribute_names=attributes["protected_attribute_names"],
                                     unprivileged_protected_attributes=attributes["unprivileged_protected_attributes"],
-                                    privileged_protected_attributes=attributes["privileged_protected_attributes"])
+                                    privileged_protected_attributes=attributes["privileged_protected_attributes"],
+                                    instance_weights_name=sample_weights_column_name)
     return dataset
 
 
-def get_privileged_and_unprivileged_groups(attributes):
+def get_privileged_and_unprivileged_groups(protected_attribute_names, unprivileged_protected_attributes,
+                                           privileged_protected_attributes):
     """
     Get privileged and unprivileged groups encoded as list(dict), to fit aif360 formating.
 
-    :param attributes: Data set attributes to generate groups from
+    :param protected_attribute_names: List of protected attribute names
+    :param unprivileged_protected_attributes: List of unprivileged protected attributes
+    :param privileged_protected_attributes: List of privileged protected attributes
     :return: Privileged and unprivileged groups encoded as list(dict)
     """
+
     unprivileged = []
     privileged = []
-    for i in range(len(attributes["protected_attribute_names"])):
+    for i in range(len(protected_attribute_names)):
         unprivileged.append(
-            {attributes["protected_attribute_names"][i]: attributes["unprivileged_protected_attributes"][i][0]
+            {protected_attribute_names[i]: unprivileged_protected_attributes[i][0]
              })
         privileged.append(
-            {attributes["protected_attribute_names"][i]: attributes["privileged_protected_attributes"][i][0]
+            {protected_attribute_names[i]: privileged_protected_attributes[i][0]
              })
     return unprivileged, privileged
 

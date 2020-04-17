@@ -1,6 +1,7 @@
 from src.experiments.baseline import baseline_experiment
+from src.experiments.reweighing import reweighing_experiment
 from src.util.plotter import plot_results
-from src.util.filehandler import write_result_to_file, read_result_from_file
+from src.util.filehandler import read_result_from_file
 
 """
 Done: 
@@ -17,14 +18,16 @@ TODO:
 
 
 def run_experiment():
-    baseline_result = baseline_experiment()
-    print('Results: ' + str(baseline_result))
+    # result = baseline_experiment()
+    result = reweighing_experiment()
+    print('Results: ' + str(result))
 
 
 def plot():
-    data1 = read_result_from_file('baseline_svm_16-04-2020_11-34.txt')  # Update to match desired file
-    data2 = read_result_from_file('baseline_svm_16-04-2020_11-55.txt')  # Update to match desired file
+    data1 = read_result_from_file('svm_reweighing_17-04-2020_10-42.txt')  # Update to match desired file
+    data2 = read_result_from_file('baseline_svm_17-04-2020_10-35.txt')  # Update to match desired file
     plot_results([data1, data2])
 
 
-plot()
+run_experiment()
+# plot()

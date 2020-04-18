@@ -16,7 +16,7 @@ def plot_result(result, label, show=False):
 
 def plot_results(result_summaries):
     x_label = 'accuracy'
-    y_label = "1 - " + result_summaries[0]["fairness_metrics"]
+    y_label = "1 - " + result_summaries[0]["fairness_metric"]
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     lines = []

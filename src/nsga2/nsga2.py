@@ -18,7 +18,7 @@ def nsga2(pop_size, num_generations, chromosome_length, mutation_rate, crossover
     population = create_population(pop_size, chromosome_length)
 
     for gen in range(num_generations):
-        if gen % 1 == 0:
+        if gen % 5 == 0:
             print("Generation " + str(gen))
 
         # Combine parents and offspring

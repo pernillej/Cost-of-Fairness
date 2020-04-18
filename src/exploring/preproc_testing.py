@@ -1,6 +1,6 @@
 from src.data import load_german_dataset
 from src.metrics import auc
-from aif360.algorithms.preprocessing import Reweighing, DisparateImpactRemover, LFR
+from aif360.algorithms.preprocessing import Reweighing, DisparateImpactRemover
 from aif360.metrics import ClassificationMetric
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC

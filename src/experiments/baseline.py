@@ -1,26 +1,22 @@
 from src.nsga2.nsga2 import nsga2
 from src.nsga2.population import get_C, get_gamma, get_selected_features
-from src.metrics import auc, statistical_parity, theil_index, disparate_impact, equal_opportunity, average_odds, \
-    function_name_to_string
-from src.data import load_german_dataframe, load_compas_dataframe, get_drop_features, dataframe_to_dataset
-from src.algorithms import baseline_svm
+from src.metrics import statistical_parity_difference, function_name_to_string
+from src.data import load_german_dataset
+from src.algorithms import svm
 from src.util.filehandler import write_result_to_file
 
-NUM_GENERATIONS = 5
-POPULATION_SIZE = 5
+NUM_GENERATIONS = 10
+POPULATION_SIZE = 10
 MUTATION_RATE = 0.05
 CROSSOVER_RATE = 0.7
 CHROMOSOME_LENGTH = 30 + 57  # 15 each for C and gamma, plus 57 for the number of features in german data set
-# CHROMOSOME_LENGTH = 30 + 400  # plus 57 for the number of features in compas data set
-METRICS = {
-    'accuracy': auc,
-    'fairness': statistical_parity
-}
-# Dataframe and attributes
-DF, DF_ATTRIBUTES = load_german_dataframe()
+FAIRNESS_METRIC = statistical_parity_difference
+DATA_SET = load_german_dataset()
+PRIVILEGED_GROUPS = [{'age': 1}]
+UNPRIVILEGED_GROUPS = [{'age': 0}]
 
 
-def baseline_experiment():
+def svm_experiment():
     """
     Baseline SVM experiment.
 
@@ -36,12 +32,11 @@ def baseline_experiment():
     # Summary to write to file
     result_summary = {'name': 'SVM',
                       'result': result,
-                      'metrics': {'accuracy': function_name_to_string(METRICS['accuracy']),
-                                  'fairness': function_name_to_string(METRICS['fairness'])},
+                      'fairness_metric': function_name_to_string(FAIRNESS_METRIC),
                       'nsga2_parameters': {'num_generations': NUM_GENERATIONS, 'population_size': POPULATION_SIZE,
                                            'crossover_rate': CROSSOVER_RATE, 'mutation_rate': MUTATION_RATE,
                                            'chromosome_length': CHROMOSOME_LENGTH}}
-    write_result_to_file(result_summary, "baseline_svm")
+    write_result_to_file(result_summary, "svm")
     # Return only the result, not the summary
     return result
 
@@ -61,10 +56,10 @@ def evaluation_function(chromosome):
         C = get_C(chromosome)
         gamma = get_gamma(chromosome)
         selected_features = get_selected_features(chromosome, 30)
-        drop_features = get_drop_features(DF_ATTRIBUTES['feature_names'], selected_features)
-        accuracy_score, fairness_score = baseline_svm(DF, METRICS, DF_ATTRIBUTES, C=C, gamma=gamma,
-                                                      drop_features=drop_features,
-                                                      label_name=DF_ATTRIBUTES["label_names"][0])
+        accuracy_score, fairness_score = svm(dataset=DATA_SET, fairness_metric=FAIRNESS_METRIC,
+                                             C=C, gamma=gamma, keep_features=selected_features,
+                                             privileged_groups=PRIVILEGED_GROUPS,
+                                             unprivileged_groups=UNPRIVILEGED_GROUPS)
         FITNESS_SCORES[str(chromosome)] = [accuracy_score, fairness_score]
         return [accuracy_score, fairness_score]
 

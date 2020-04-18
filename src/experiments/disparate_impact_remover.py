@@ -1,26 +1,24 @@
 from src.nsga2.nsga2 import nsga2
-from src.nsga2.population import get_C, get_gamma, get_repair_level, get_selected_features
-from src.metrics import auc, statistical_parity, theil_index, function_name_to_string
-from src.data import load_german_dataframe, get_drop_features
+from src.nsga2.population import get_C, get_gamma, get_selected_features
+from src.metrics import statistical_parity_difference, function_name_to_string
+from src.data import load_german_dataset
 from src.algorithms import svm_dir
 from src.util.filehandler import write_result_to_file
 
-NUM_GENERATIONS = 5
+NUM_GENERATIONS = 10
 POPULATION_SIZE = 10
 MUTATION_RATE = 0.05
 CROSSOVER_RATE = 0.7
-CHROMOSOME_LENGTH = 35 + 57  # 15 each for C and gamma, 5 for repair level, 57 for the number of features in german data
-METRICS = {  # Statistical parity seems to keep getting 1 as fairness score always?
-    'accuracy': auc,
-    'fairness': statistical_parity
-}
-# Dataframe and attributes
-DF, DF_ATTRIBUTES = load_german_dataframe()
+CHROMOSOME_LENGTH = 30 + 57  # 15 each for C and gamma, plus 57 for the number of features in german data set
+FAIRNESS_METRIC = statistical_parity_difference
+DATA_SET = load_german_dataset()
+PRIVILEGED_GROUPS = [{'age': 1}]
+UNPRIVILEGED_GROUPS = [{'age': 0}]
 
 
-def dir_experiment():
+def svm_dir_experiment():
     """
-    Reweighing with SVM experiment.
+    SVM with Disparate Impact Remover experiment.
 
     :return: Resulting Pareto front
     """
@@ -34,8 +32,7 @@ def dir_experiment():
     # Summary to write to file
     result_summary = {'name': 'SVM_DIR',
                       'result': result,
-                      'metrics': {'accuracy': function_name_to_string(METRICS['accuracy']),
-                                  'fairness': function_name_to_string(METRICS['fairness'])},
+                      'fairness_metric': function_name_to_string(FAIRNESS_METRIC),
                       'nsga2_parameters': {'num_generations': NUM_GENERATIONS, 'population_size': POPULATION_SIZE,
                                            'crossover_rate': CROSSOVER_RATE, 'mutation_rate': MUTATION_RATE,
                                            'chromosome_length': CHROMOSOME_LENGTH}}
@@ -47,7 +44,7 @@ def dir_experiment():
 def evaluation_function(chromosome):
     """
     Function the be used to evaluate the NSGA-II chromosomes and return fitness scores.
-    Contains the svm_dir algorithm, that returns the fitness scores for the specified metrics.
+    Contains the svm with disparate impact remover algorithm, that returns the fitness scores for the specified metrics.
 
     :param chromosome: Chromosome to specify parameters for SVM
     :return: The fitness scores in a list: [accuracy_score, fairness_score]
@@ -58,13 +55,12 @@ def evaluation_function(chromosome):
     else:
         C = get_C(chromosome)
         gamma = get_gamma(chromosome)
-        repair_level = get_repair_level(chromosome)
         selected_features = get_selected_features(chromosome, 30)
-        drop_features = get_drop_features(DF_ATTRIBUTES['feature_names'], selected_features)
-        accuracy_score, fairness_score = svm_dir(DF, METRICS, DF_ATTRIBUTES, C=C, gamma=gamma,
-                                                 repair_level=repair_level, drop_features=drop_features)
+        accuracy_score, fairness_score = svm_dir(dataset=DATA_SET, fairness_metric=FAIRNESS_METRIC,
+                                                 C=C, gamma=gamma, keep_features=selected_features,
+                                                 privileged_groups=PRIVILEGED_GROUPS,
+                                                 unprivileged_groups=UNPRIVILEGED_GROUPS)
         FITNESS_SCORES[str(chromosome)] = [accuracy_score, fairness_score]
-        print(fairness_score)
         return [accuracy_score, fairness_score]
 
 

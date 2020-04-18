@@ -123,20 +123,4 @@ def get_selected_features(chromosome, start_index):
     :return: List of selected features, as a list of bits indicating if a
              feature corresponding to the index is selected or not
     """
-    return chromosome[start_index:]
-
-
-def get_repair_level(chromosome):
-    rl = from_binary_to_float_in_range(chromosome[30:35], 2, [-4, 0])
-    return rl
-
-
-def get_tau(chromosome):
-    """
-    Get the tau parameter for the Meta-Fair algorithm
-
-    :param chromosome: Chromosome to get tau value from
-    :return: tau value as a float in range [0,1]
-    """
-    tau = from_binary_to_float_in_range(chromosome[:15], 4, [-16, 0])
-    return tau
+    return np.where(chromosome[start_index:] == 1)[0]

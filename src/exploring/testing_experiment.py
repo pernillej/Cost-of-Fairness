@@ -1,17 +1,9 @@
 from src.nsga2.nsga2 import nsga2
 from src.nsga2.population import get_C, get_gamma, get_selected_features
 from src.metrics import statistical_parity_difference, function_name_to_string
-from src.data import load_german_dataframe, get_drop_features, load_german_dataset
-from src.algorithms import baseline_svm, svm, svm_reweighing, svm_dir, svm_roc, svm_ceq
+from src.data import load_german_dataset
+from src.algorithms import svm, svm_reweighing, svm_dir, svm_roc, svm_ceq
 from src.util.filehandler import write_result_to_file
-
-from aif360.algorithms.preprocessing import Reweighing, DisparateImpactRemover
-from aif360.algorithms.inprocessing import AdversarialDebiasing, PrejudiceRemover
-from aif360.algorithms.postprocessing import RejectOptionClassification, CalibratedEqOddsPostprocessing
-from aif360.metrics import ClassificationMetric
-from sklearn.preprocessing import StandardScaler
-from sklearn.svm import SVC
-import numpy as np
 
 NUM_GENERATIONS = 10
 POPULATION_SIZE = 20
@@ -40,7 +32,7 @@ def testing_experiment():
     # Summary to write to file
     result_summary = {'name': 'SVM',
                       'result': result,
-                      'fairness_metrics': function_name_to_string(FAIRNESS_METRIC),
+                      'fairness_metric': function_name_to_string(FAIRNESS_METRIC),
                       'nsga2_parameters': {'num_generations': NUM_GENERATIONS, 'population_size': POPULATION_SIZE,
                                            'crossover_rate': CROSSOVER_RATE, 'mutation_rate': MUTATION_RATE,
                                            'chromosome_length': CHROMOSOME_LENGTH}}
@@ -64,11 +56,10 @@ def evaluation_function(chromosome):
         C = get_C(chromosome)
         gamma = get_gamma(chromosome)
         selected_features = get_selected_features(chromosome, 30)
-        keep_features = np.where(selected_features == 1)[0]
-        accuracy_score, fairness_score = svm_ceq(dataset=DATA_SET, fairness_metric=FAIRNESS_METRIC,
-                                                 C=C, gamma=gamma, keep_features=keep_features,
-                                                 privileged_groups=PRIVILEGED_GROUPS,
-                                                 unprivileged_groups=UNPRIVILEGED_GROUPS)
+        accuracy_score, fairness_score = svm(dataset=DATA_SET, fairness_metric=FAIRNESS_METRIC,
+                                             C=C, gamma=gamma, keep_features=selected_features,
+                                             privileged_groups=PRIVILEGED_GROUPS,
+                                             unprivileged_groups=UNPRIVILEGED_GROUPS)
         FITNESS_SCORES[str(chromosome)] = [accuracy_score, fairness_score]
         return [accuracy_score, fairness_score]
 
@@ -77,3 +68,4 @@ def evaluation_function(chromosome):
 Collects scores already calculated to remove unnecessary burden of recalculating for identical chromosomes
 """
 FITNESS_SCORES = {}
+

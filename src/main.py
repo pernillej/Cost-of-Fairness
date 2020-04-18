@@ -1,11 +1,10 @@
-from src.experiments.baseline import baseline_experiment
-from src.experiments.reweighing import reweighing_experiment
-from src.experiments.metafair import metafair_experiment
-from src.experiments.roc import roc_experiment
-from src.experiments.dir import dir_experiment
+from src.experiments.reweighing import svm_reweighing_experiment
+from src.experiments.roc import svm_roc_experiment
+from src.experiments.baseline import svm_experiment
+from src.experiments.calibrated_eq_odds import svm_caleqodds_experiment
+from src.experiments.disparate_impact_remover import svm_dir_experiment
 from src.util.plotter import plot_results
 from src.util.filehandler import read_result_from_file
-from src.data import load_compas_dataframe
 
 """
 Done: 
@@ -14,26 +13,38 @@ Done:
 3. Add basic metrics
 4. Setup NSGA2
 5. Add saving and plotting of results
+6. Add out mitigation methods to svm
 
 TODO:
-5. Add/switch out mitigation methods to svm
-6. Customize...
+Customize...
 """
 
 
 def run_experiment():
-    result = baseline_experiment()
-    # result = reweighing_experiment()
-    # result = metafair_experiment() NOT WORKING
-    # result = roc_experiment() NOT WORKING
-    # result = dir_experiment()
+    print("Running SVM")
+    result = svm_experiment()
+    print('Results: ' + str(result))
+    print("Running SVM with Reweighing")
+    result = svm_reweighing_experiment()
+    print('Results: ' + str(result))
+    print("Running SVM with DisparateImpactRemover")
+    result = svm_dir_experiment()
+    print('Results: ' + str(result))
+    print("Running SVM with Calibrated Eq Odds")
+    result = svm_caleqodds_experiment()
+    print('Results: ' + str(result))
+    print("Running SVM with ROC")
+    result = svm_roc_experiment()
     print('Results: ' + str(result))
 
 
 def plot():
-    data1 = read_result_from_file('svm_reweighing_17-04-2020_10-42.txt')  # Update to match desired file
-    data2 = read_result_from_file('baseline_svm_17-04-2020_10-35.txt')  # Update to match desired file
-    plot_results([data1, data2])
+    svm_results = read_result_from_file('svm_18-04-2020_15-07.txt')
+    reweighing_results = read_result_from_file('svm_reweighing_18-04-2020_15-07.txt')
+    dir_results = read_result_from_file('svm_dir_18-04-2020_15-07.txt')
+    caleqodds_results = read_result_from_file('svm_caleqodds_18-04-2020_15-07.txt')
+
+    plot_results([svm_results, reweighing_results, dir_results, caleqodds_results])
 
 
 run_experiment()

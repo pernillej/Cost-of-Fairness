@@ -1,6 +1,5 @@
 from src.data import load_german_dataset
-from aif360.algorithms.postprocessing import RejectOptionClassification, CalibratedEqOddsPostprocessing, \
-    EqOddsPostprocessing
+from aif360.algorithms.postprocessing import RejectOptionClassification, CalibratedEqOddsPostprocessing
 from aif360.metrics import ClassificationMetric
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
@@ -41,11 +40,7 @@ pp = pp.fit(dataset_orig_train, dataset_orig_train_pred)
 # Calibrated Equalized Odds
 pp = CalibratedEqOddsPostprocessing(privileged_groups=privileged_groups, unprivileged_groups=unprivileged_groups)
 pp = pp.fit(dataset_orig_train, dataset_orig_train_pred)
-"""
-# Equalized Odds
-pp = EqOddsPostprocessing(privileged_groups=privileged_groups, unprivileged_groups=unprivileged_groups)
-pp = pp.fit(dataset_orig_train, dataset_orig_train_pred)
-"""
+
 dataset_transf_test_pred = pp.predict(dataset_orig_test_pred)
 
 cm = ClassificationMetric(dataset_orig_test, dataset_transf_test_pred,

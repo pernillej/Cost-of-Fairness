@@ -110,6 +110,11 @@ def svm_dir(dataset, fairness_metric, C, gamma, keep_features, privileged_groups
     return accuracy_score, fairness_score
 
 
+def svm_optimpreproc(dataset, fairness_metric, C, gamma, privileged_groups, unprivileged_groups):
+    return svm(dataset=dataset, fairness_metric=fairness_metric, C=C, gamma=gamma, keep_features=[],
+               privileged_groups=privileged_groups, unprivileged_groups=unprivileged_groups)
+
+
 def svm_roc(dataset, fairness_metric, C, gamma, keep_features, privileged_groups, unprivileged_groups):
     # Split data
     dataset_orig_train, dataset_orig_test = dataset.split([0.8], shuffle=True)

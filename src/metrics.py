@@ -40,14 +40,16 @@ def average_odds_difference(classification_metric):
 
 def disparate_impact(classification_metric):
     """
-    Calculate Disparate Impact score: |0.5 - Average Odds Difference|
+    Calculate Disparate Impact score: 1 - |1 - Average Odds Difference|
     Disparate Impact = 𝑃𝑟(𝑌̂ =1|𝐷=unprivileged)/𝑃𝑟(𝑌̂ =1|𝐷=privileged),
-    which means that 0.5 is perfect fairness.
+    which means that 1 is perfect fairness, but the score can also be above 1
+    depending on which group is getting the best outcome,
+    meaning it has to be scaled down to fit in range [0,1] where 1 is best.
 
     :param classification_metric: aif369 ClassificationMetric type containing the true, and the predicted data sets
     :return: Equal Opportunity Difference score
     """
-    return abs(0.5 - classification_metric.disparate_impact())
+    return 1 - abs(1 - classification_metric.disparate_impact())
 
 
 def function_name_to_string(func):

@@ -2,6 +2,7 @@ from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
 from aif360.algorithms.preprocessing import Reweighing, DisparateImpactRemover
 from aif360.algorithms.postprocessing import RejectOptionClassification, CalibratedEqOddsPostprocessing
+from aif360.algorithms.inprocessing import MetaFairClassifier, PrejudiceRemover
 from aif360.metrics import ClassificationMetric
 import numpy as np
 
@@ -185,3 +186,57 @@ def svm_ceq(dataset, fairness_metric, C, gamma, keep_features, privileged_groups
     accuracy_score = cm.accuracy()
     fairness_score = fairness_metric(cm)
     return accuracy_score, fairness_score
+
+
+def meta_fair(dataset, fairness_metric, tau, sensitive_attr, privileged_groups, unprivileged_groups):
+    # Split dataset
+    dataset_orig_train, dataset_orig_test = dataset.split([0.8], shuffle=True)
+
+    # Prepare data
+    scale = StandardScaler()
+    dataset_train = dataset_orig_train.copy()
+    dataset_train.features = scale.fit_transform(dataset_train.features)
+    dataset_test = dataset_orig_test.copy()
+    dataset_test.features = scale.fit_transform(dataset_test.features)
+
+    # Train
+    model = MetaFairClassifier(tau=tau, sensitive_attr=sensitive_attr)
+    model.fit(dataset_orig_train)
+
+    # Test
+    dataset_debiasing_test = model.predict(dataset_test)
+
+    cm = ClassificationMetric(dataset_test, dataset_debiasing_test,
+                              unprivileged_groups=unprivileged_groups, privileged_groups=privileged_groups)
+    accuracy_score = cm.accuracy()
+    fairness_score = fairness_metric(cm)
+    return accuracy_score, fairness_score
+
+
+def prejudice_remover(dataset, fairness_metric, eta, sensitive_attr, privileged_groups, unprivileged_groups):
+    # Split dataset
+    dataset_orig_train, dataset_orig_test = dataset.split([0.8], shuffle=True)
+
+    # Prepare data
+    scale = StandardScaler()
+    dataset_train = dataset_orig_train.copy()
+    dataset_train.features = scale.fit_transform(dataset_train.features)
+    dataset_test = dataset_orig_test.copy()
+    dataset_test.features = scale.fit_transform(dataset_test.features)
+
+    # Train
+    model = PrejudiceRemover(sensitive_attr=sensitive_attr, eta=eta)
+    model.fit(dataset_orig_train)
+
+    # Test
+    dataset_debiasing_test = model.predict(dataset_test)
+
+    cm = ClassificationMetric(dataset_test, dataset_debiasing_test,
+                              unprivileged_groups=unprivileged_groups, privileged_groups=privileged_groups)
+    accuracy_score = cm.accuracy()
+    fairness_score = fairness_metric(cm)
+    return accuracy_score, fairness_score
+
+
+
+

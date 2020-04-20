@@ -1,7 +1,7 @@
 from src.nsga2.nsga2 import nsga2
 from src.nsga2.population import get_C, get_gamma, get_selected_features
 from src.metrics import function_name_to_string
-from src.algorithms import svm_ceq
+from src.experiment1.algorithms import svm_dir
 from src.util.filehandler import write_result_to_file
 
 """ 
@@ -10,10 +10,10 @@ Collects scores already calculated to remove unnecessary burden of recalculating
 FITNESS_SCORES = {}
 
 
-def svm_caleqodds_experiment(num_generations, population_size, mutation_rate, crossover_rate, chromosome_length,
-                             fairness_metric, data_set, privileged_groups, unprivileged_groups):
+def svm_dir_experiment(num_generations, population_size, mutation_rate, crossover_rate, chromosome_length,
+                       fairness_metric, data_set, privileged_groups, unprivileged_groups):
     """
-    SVM with Calibrated Equalized Odds experiment.
+    SVM with Disparate Impact Remover experiment.
 
     :param num_generations: Number of generations for NSGA-II
     :param population_size: Population size for NSGA-II
@@ -26,12 +26,12 @@ def svm_caleqodds_experiment(num_generations, population_size, mutation_rate, cr
     :param unprivileged_groups: The unprivileged groups in the data set
     :return: Resulting Pareto front
     """
-
     # Defines the evaluation function
     def evaluation_function(chromosome):
         """
         Function the be used to evaluate the NSGA-II chromosomes and return fitness scores.
-        Contains the svm with calibrated equalized odds algorithm, that returns the fitness scores for the specified metrics.
+        Contains the svm with disparate impact remover algorithm,
+        that returns the fitness scores for the specified metrics.
 
         :param chromosome: Chromosome to specify parameters for SVM
         :return: The fitness scores in a list: [accuracy_score, fairness_score]
@@ -43,7 +43,7 @@ def svm_caleqodds_experiment(num_generations, population_size, mutation_rate, cr
             C = get_C(chromosome)
             gamma = get_gamma(chromosome)
             selected_features = get_selected_features(chromosome, 30)
-            accuracy_score, fairness_score = svm_ceq(dataset=data_set, fairness_metric=fairness_metric,
+            accuracy_score, fairness_score = svm_dir(dataset=data_set, fairness_metric=fairness_metric,
                                                      C=C, gamma=gamma, keep_features=selected_features,
                                                      privileged_groups=privileged_groups,
                                                      unprivileged_groups=unprivileged_groups)
@@ -59,12 +59,12 @@ def svm_caleqodds_experiment(num_generations, population_size, mutation_rate, cr
                    evaluation_algorithm=evaluation_function)
 
     # Writes summary to file
-    result_summary = {'name': 'SVM_CalEqOdds',
+    result_summary = {'name': 'SVM_DIR',
                       'result': result,
                       'fairness_metric': function_name_to_string(fairness_metric),
                       'nsga2_parameters': {'num_generations': num_generations, 'population_size': population_size,
                                            'crossover_rate': crossover_rate, 'mutation_rate': mutation_rate,
                                            'chromosome_length': chromosome_length}}
-    write_result_to_file(result_summary, "svm_caleqodds")
+    write_result_to_file(result_summary, "svm_dir")
     # Return only the result, not the summary
     return result

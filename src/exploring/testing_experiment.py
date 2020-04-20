@@ -2,7 +2,7 @@ from src.nsga2.nsga2 import nsga2
 from src.nsga2.population import get_C, get_gamma, get_selected_features
 from src.metrics import statistical_parity_difference, function_name_to_string
 from src.data import load_german_dataset
-from src.algorithms import svm, svm_reweighing, svm_dir, svm_roc, svm_ceq
+from src.exploring.full_algorithms import svm
 from src.util.filehandler import write_result_to_file
 
 NUM_GENERATIONS = 10

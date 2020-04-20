@@ -3,8 +3,8 @@ from pathlib import Path
 import json
 import os
 
-# This is relative to the main.py file. Update when running from different file
-RESULT_FOLDER = os.path.abspath("src/results")
+# This is relative to the main.py file in each experiment folder. Update when running from different file
+RESULT_FOLDER = os.path.abspath("results")
 
 
 def write_result_to_file(result, file_prefix):

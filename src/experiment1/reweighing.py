@@ -1,20 +1,14 @@
 from src.nsga2.nsga2 import nsga2
 from src.nsga2.population import get_C, get_gamma, get_selected_features
-from src.metrics import statistical_parity_difference, function_name_to_string
-from src.data import load_german_dataset
-from src.algorithms import svm_roc
+from src.metrics import function_name_to_string
+from src.experiment1.algorithms import svm_reweighing
 from src.util.filehandler import write_result_to_file
 
-""" 
-Collects scores already calculated to remove unnecessary burden of recalculating for identical chromosomes
-"""
-FITNESS_SCORES = {}
 
-
-def svm_roc_experiment(num_generations, population_size, mutation_rate, crossover_rate, chromosome_length,
-                       fairness_metric, data_set, privileged_groups, unprivileged_groups):
+def svm_reweighing_experiment(num_generations, population_size, mutation_rate, crossover_rate, chromosome_length,
+                              fairness_metric, data_set, privileged_groups, unprivileged_groups):
     """
-    SVM with ROC experiment.
+    SVM with Reweighing experiment.
 
     :param num_generations: Number of generations for NSGA-II
     :param population_size: Population size for NSGA-II
@@ -32,7 +26,7 @@ def svm_roc_experiment(num_generations, population_size, mutation_rate, crossove
     def evaluation_function(chromosome):
         """
         Function the be used to evaluate the NSGA-II chromosomes and return fitness scores.
-        Contains the svm with ROC algorithm, that returns the fitness scores for the specified metrics.
+        Contains the svm with reweighing algorithm, that returns the fitness scores for the specified metrics.
 
         :param chromosome: Chromosome to specify parameters for SVM
         :return: The fitness scores in a list: [accuracy_score, fairness_score]
@@ -44,10 +38,10 @@ def svm_roc_experiment(num_generations, population_size, mutation_rate, crossove
             C = get_C(chromosome)
             gamma = get_gamma(chromosome)
             selected_features = get_selected_features(chromosome, 30)
-            accuracy_score, fairness_score = svm_roc(dataset=data_set, fairness_metric=fairness_metric,
-                                                     C=C, gamma=gamma, keep_features=selected_features,
-                                                     privileged_groups=privileged_groups,
-                                                     unprivileged_groups=unprivileged_groups)
+            accuracy_score, fairness_score = svm_reweighing(dataset=data_set, fairness_metric=fairness_metric,
+                                                            C=C, gamma=gamma, keep_features=selected_features,
+                                                            privileged_groups=privileged_groups,
+                                                            unprivileged_groups=unprivileged_groups)
             FITNESS_SCORES[str(chromosome)] = [accuracy_score, fairness_score]
             return [accuracy_score, fairness_score]
 
@@ -60,12 +54,18 @@ def svm_roc_experiment(num_generations, population_size, mutation_rate, crossove
                    evaluation_algorithm=evaluation_function)
 
     # Writes summary to file
-    result_summary = {'name': 'SVM_ROC',
+    result_summary = {'name': 'SVM_Reweighing',
                       'result': result,
                       'fairness_metric': function_name_to_string(fairness_metric),
                       'nsga2_parameters': {'num_generations': num_generations, 'population_size': population_size,
                                            'crossover_rate': crossover_rate, 'mutation_rate': mutation_rate,
                                            'chromosome_length': chromosome_length}}
-    write_result_to_file(result_summary, "svm_roc")
+    write_result_to_file(result_summary, "svm_reweighing")
     # Return only the result, not the summary
     return result
+
+
+""" 
+Collects scores already calculated to remove unnecessary burden of recalculating for identical chromosomes
+"""
+FITNESS_SCORES = {}

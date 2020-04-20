@@ -1,7 +1,7 @@
 from src.nsga2.nsga2 import nsga2
 from src.nsga2.population import get_C, get_gamma
 from src.metrics import function_name_to_string
-from src.algorithms import svm_optimpreproc
+from src.experiment1.algorithms import svm_optimpreproc
 from src.util.filehandler import write_result_to_file
 
 """ 

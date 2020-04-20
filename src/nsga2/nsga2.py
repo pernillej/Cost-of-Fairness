@@ -39,7 +39,7 @@ def nsga2(pop_size, num_generations, chromosome_length, mutation_rate, crossover
 
 
 """
-Code below from (with updates, adaptations and fixes): 
+Code below from (with some updates, adaptations and fixes): 
 https://pythonhealthcare.org/2019/01/17/117-genetic-algorithms-2-a-multiple-objective-genetic-algorithm-nsga-ii/
 """
 

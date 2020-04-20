@@ -8,6 +8,18 @@ import numpy as np
 
 
 def svm(dataset, fairness_metric, C, gamma, keep_features, privileged_groups, unprivileged_groups):
+    """
+    Run SVM(SVC) classifier on specified data set, with provided parameters, and calculate fitness scores.
+
+    :param dataset: The data set to run the classifier on
+    :param fairness_metric: The fairness metric to calculate
+    :param C: The C parameter for SVC
+    :param gamma: The gamma parameter for SVC
+    :param keep_features: The features to keep for SVC
+    :param privileged_groups: The privileged group in the data set
+    :param unprivileged_groups: The unprivileged group in the data set
+    :return:
+    """
     # Split dataset
     dataset_orig_train, dataset_orig_test = dataset.split([0.8], shuffle=True)
 
@@ -31,6 +43,7 @@ def svm(dataset, fairness_metric, C, gamma, keep_features, privileged_groups, un
     dataset_orig_test_pred.labels = clf.predict(X_test)
     dataset_orig_test_pred.scores = clf.predict_proba(X_test)[:, pos_ind].reshape(-1, 1)
 
+    # Calculate metrics
     cm = ClassificationMetric(dataset_orig_test, dataset_orig_test_pred,
                               unprivileged_groups=unprivileged_groups, privileged_groups=privileged_groups)
     accuracy_score = cm.accuracy()
@@ -39,6 +52,19 @@ def svm(dataset, fairness_metric, C, gamma, keep_features, privileged_groups, un
 
 
 def svm_reweighing(dataset, fairness_metric, C, gamma, keep_features, privileged_groups, unprivileged_groups):
+    """
+    Run SVM classifier with Reweighing preprocessing on specified data set,
+    with provided parameters, and calculate fitness scores.
+
+    :param dataset: The data set to run the classifier on
+    :param fairness_metric: The fairness metric to calculate
+    :param C: The C parameter for SVC
+    :param gamma: The gamma parameter for SVC
+    :param keep_features: The features to keep for SVC
+    :param privileged_groups: The privileged group in the data set
+    :param unprivileged_groups: The unprivileged group in the data set
+    :return:
+    """
     # Split dataset
     dataset_orig_train, dataset_orig_test = dataset.split([0.8], shuffle=True)
 
@@ -66,6 +92,7 @@ def svm_reweighing(dataset, fairness_metric, C, gamma, keep_features, privileged
     dataset_transf_test_pred.labels = clf.predict(X_test)
     dataset_transf_test_pred.scores = clf.predict_proba(X_test)[:, pos_ind].reshape(-1, 1)
 
+    # Calculate metrics
     cm = ClassificationMetric(dataset_orig_test, dataset_transf_test_pred,
                               unprivileged_groups=unprivileged_groups, privileged_groups=privileged_groups)
 
@@ -75,6 +102,19 @@ def svm_reweighing(dataset, fairness_metric, C, gamma, keep_features, privileged
 
 
 def svm_dir(dataset, fairness_metric, C, gamma, keep_features, privileged_groups, unprivileged_groups):
+    """
+    Run SVM classifier with Disparate Impact Remover preprocessing on specified data set,
+    with provided parameters, and calculate fitness scores.
+
+    :param dataset: The data set to run the classifier on
+    :param fairness_metric: The fairness metric to calculate
+    :param C: The C parameter for SVC
+    :param gamma: The gamma parameter for SVC
+    :param keep_features: The features to keep for SVC
+    :param privileged_groups: The privileged group in the data set
+    :param unprivileged_groups: The unprivileged group in the data set
+    :return:
+    """
     # Split dataset
     dataset_orig_train, dataset_orig_test = dataset.split([0.8], shuffle=True)
 
@@ -102,6 +142,7 @@ def svm_dir(dataset, fairness_metric, C, gamma, keep_features, privileged_groups
     dataset_transf_test_pred.labels = clf.predict(X_test)
     dataset_transf_test_pred.scores = clf.predict_proba(X_test)[:, pos_ind].reshape(-1, 1)
 
+    # Calculate metrics
     cm = ClassificationMetric(dataset_orig_test, dataset_transf_test_pred,
                               unprivileged_groups=unprivileged_groups, privileged_groups=privileged_groups)
 
@@ -111,11 +152,37 @@ def svm_dir(dataset, fairness_metric, C, gamma, keep_features, privileged_groups
 
 
 def svm_optimpreproc(dataset, fairness_metric, C, gamma, privileged_groups, unprivileged_groups):
+    """
+    Run SVM classifier with Optimized Preprocessing method on specified data set,
+    with provided parameters, and calculate fitness scores.
+
+    :param dataset: The data set to run the classifier on
+    :param fairness_metric: The fairness metric to calculate
+    :param C: The C parameter for SVC
+    :param gamma: The gamma parameter for SVC
+    :param keep_features: The features to keep for SVC
+    :param privileged_groups: The privileged group in the data set
+    :param unprivileged_groups: The unprivileged group in the data set
+    :return:
+    """
     return svm(dataset=dataset, fairness_metric=fairness_metric, C=C, gamma=gamma, keep_features=[],
                privileged_groups=privileged_groups, unprivileged_groups=unprivileged_groups)
 
 
 def svm_roc(dataset, fairness_metric, C, gamma, keep_features, privileged_groups, unprivileged_groups):
+    """
+    Run SVM classifier with Reject Option Classification prosprocessing on specified data set,
+    with provided parameters, and calculate fitness scores.
+
+    :param dataset: The data set to run the classifier on
+    :param fairness_metric: The fairness metric to calculate
+    :param C: The C parameter for SVC
+    :param gamma: The gamma parameter for SVC
+    :param keep_features: The features to keep for SVC
+    :param privileged_groups: The privileged group in the data set
+    :param unprivileged_groups: The unprivileged group in the data set
+    :return:
+    """
     # Split data
     dataset_orig_train, dataset_orig_test = dataset.split([0.8], shuffle=True)
 
@@ -142,11 +209,13 @@ def svm_roc(dataset, fairness_metric, C, gamma, keep_features, privileged_groups
     dataset_orig_test_pred.labels = clf.predict(X_test)
     dataset_orig_test_pred.scores = clf.predict_proba(X_test)[:, pos_ind].reshape(-1, 1)
 
+    # Run ROC
     pp = RejectOptionClassification(unprivileged_groups=unprivileged_groups, privileged_groups=privileged_groups)
     pp = pp.fit(dataset_orig_train, dataset_orig_train_pred)
 
     dataset_transf_test_pred = pp.predict(dataset_orig_test_pred)
 
+    # Calculate metrics
     cm = ClassificationMetric(dataset_orig_test, dataset_transf_test_pred,
                               unprivileged_groups=unprivileged_groups, privileged_groups=privileged_groups)
     accuracy_score = cm.accuracy()
@@ -155,6 +224,19 @@ def svm_roc(dataset, fairness_metric, C, gamma, keep_features, privileged_groups
 
 
 def svm_ceq(dataset, fairness_metric, C, gamma, keep_features, privileged_groups, unprivileged_groups):
+    """
+    Run SVM classifier with Calibrated Equalized Odds postprocessing on specified data set,
+    with provided parameters, and calculate fitness scores.
+
+    :param dataset: The data set to run the classifier on
+    :param fairness_metric: The fairness metric to calculate
+    :param C: The C parameter for SVC
+    :param gamma: The gamma parameter for SVC
+    :param keep_features: The features to keep for SVC
+    :param privileged_groups: The privileged group in the data set
+    :param unprivileged_groups: The unprivileged group in the data set
+    :return:
+    """
     # Split data
     dataset_orig_train, dataset_orig_test = dataset.split([0.8], shuffle=True)
 
@@ -181,11 +263,13 @@ def svm_ceq(dataset, fairness_metric, C, gamma, keep_features, privileged_groups
     dataset_orig_test_pred.labels = clf.predict(X_test)
     dataset_orig_test_pred.scores = clf.predict_proba(X_test)[:, pos_ind].reshape(-1, 1)
 
+    # Run CalibratedEqOddsPostprocessing
     pp = CalibratedEqOddsPostprocessing(privileged_groups=privileged_groups, unprivileged_groups=unprivileged_groups)
     pp = pp.fit(dataset_orig_train, dataset_orig_train_pred)
 
     dataset_transf_test_pred = pp.predict(dataset_orig_test_pred)
 
+    # Calculate metrics
     cm = ClassificationMetric(dataset_orig_test, dataset_transf_test_pred,
                               unprivileged_groups=unprivileged_groups, privileged_groups=privileged_groups)
     accuracy_score = cm.accuracy()
@@ -194,6 +278,17 @@ def svm_ceq(dataset, fairness_metric, C, gamma, keep_features, privileged_groups
 
 
 def meta_fair(dataset, fairness_metric, tau, sensitive_attr, privileged_groups, unprivileged_groups):
+    """
+    Run MetaFair classifier on specified data set, with provided parameters, and calculate fitness scores
+
+    :param dataset: The data set to run the classifier on
+    :param fairness_metric: The fairness metric to calculate
+    :param tau: The tau parameter for MetaFair
+    :param sensitive_attr: The sensitive attribute name for the dataset, to supply MetaFair
+    :param privileged_groups: The privileged group in the data set
+    :param unprivileged_groups: The unprivileged group in the data set
+    :return:
+    """
     # Split dataset
     dataset_orig_train, dataset_orig_test = dataset.split([0.8], shuffle=True)
 
@@ -211,6 +306,7 @@ def meta_fair(dataset, fairness_metric, tau, sensitive_attr, privileged_groups, 
     # Test
     dataset_debiasing_test = model.predict(dataset_test)
 
+    # Calculate metrics
     cm = ClassificationMetric(dataset_test, dataset_debiasing_test,
                               unprivileged_groups=unprivileged_groups, privileged_groups=privileged_groups)
     accuracy_score = cm.accuracy()
@@ -219,6 +315,17 @@ def meta_fair(dataset, fairness_metric, tau, sensitive_attr, privileged_groups, 
 
 
 def prejudice_remover(dataset, fairness_metric, eta, sensitive_attr, privileged_groups, unprivileged_groups):
+    """
+    Run Prejudice Remover classifier on specified data set, with provided parameters, and calculate fitness scores
+
+    :param dataset: The data set to run the classifier on
+    :param fairness_metric: The fairness metric to calculate
+    :param eta: The eta parameter for PrejudiceRemover
+    :param sensitive_attr: The sensitive attribute name for the dataset, to supply PrejudiceRemover
+    :param privileged_groups: The privileged group in the data set
+    :param unprivileged_groups: The unprivileged group in the data set
+    :return:
+    """
     # Split dataset
     dataset_orig_train, dataset_orig_test = dataset.split([0.8], shuffle=True)
 
@@ -236,6 +343,7 @@ def prejudice_remover(dataset, fairness_metric, eta, sensitive_attr, privileged_
     # Test
     dataset_debiasing_test = model.predict(dataset_test)
 
+    # Calculate metrics
     cm = ClassificationMetric(dataset_test, dataset_debiasing_test,
                               unprivileged_groups=unprivileged_groups, privileged_groups=privileged_groups)
     accuracy_score = cm.accuracy()

@@ -1,6 +1,9 @@
 from src.nsga2.population import create_population, generate_children, get_population_fitness
-import numpy as np
 import random
+import numpy as np
+np.seterr(divide='ignore', invalid='ignore')  # If all chromosomes sent through tournament selection are equal,
+# the nomalizing will fail with a division by zero error in calculate_crowding_distance.
+# Ignores this, because the code is still able to select chromosomes
 
 
 def nsga2(pop_size, num_generations, chromosome_length, mutation_rate, crossover_rate, evaluation_algorithm):

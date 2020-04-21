@@ -4,6 +4,11 @@ from src.metrics import function_name_to_string
 from src.experiment1.algorithms import svm_reweighing
 from src.util.filehandler import write_result_to_file
 
+""" 
+Collects scores already calculated to remove unnecessary burden of recalculating for identical chromosomes
+"""
+FITNESS_SCORES = {}
+
 
 def svm_reweighing_experiment(num_generations, population_size, mutation_rate, crossover_rate, chromosome_length,
                               fairness_metric, accuracy_metric, data_set, privileged_groups, unprivileged_groups):
@@ -66,9 +71,3 @@ def svm_reweighing_experiment(num_generations, population_size, mutation_rate, c
     write_result_to_file(result_summary, "svm_reweighing")
     # Return only the result, not the summary
     return result
-
-
-""" 
-Collects scores already calculated to remove unnecessary burden of recalculating for identical chromosomes
-"""
-FITNESS_SCORES = {}

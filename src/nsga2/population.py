@@ -110,7 +110,7 @@ def get_gamma(chromosome):
     :param chromosome: Chromosome to get gamma value from
     :return: gamma value as a float in range [1/2^10, 2^3]
     """
-    gamma = from_binary_to_float_in_range(chromosome[15:29], 4, [-10, 3])
+    gamma = from_binary_to_float_in_range(chromosome[15:30], 4, [-10, 3])
     return gamma
 
 
@@ -124,3 +124,7 @@ def get_selected_features(chromosome, start_index):
              feature corresponding to the index is selected or not
     """
     return np.where(chromosome[start_index:] == 1)[0]
+
+def get_classification_threshold(chromosome):
+    thresh = from_binary_to_float_in_range(chromosome[30:35], 2, [-4, 0])
+    return thresh

@@ -13,8 +13,8 @@ from src.metrics import statistical_parity_difference, theil_index, disparate_im
 Configuration
 """
 
-NUM_GENERATIONS = 100
-POPULATION_SIZE = 50
+NUM_GENERATIONS = 10
+POPULATION_SIZE = 20
 MUTATION_RATE = 0.05
 CROSSOVER_RATE = 0.7
 CHROMOSOME_LENGTH = 30 + 57  # 15 each for C and gamma, + 57 for the number of features in german data set
@@ -24,7 +24,7 @@ OPTIM_PREPROC_DATA_SET = load_preproc_data_german()
 PRIVILEGED_GROUPS = [{'age': 1}]
 UNPRIVILEGED_GROUPS = [{'age': 0}]
 FAIRNESS_METRIC = statistical_parity_difference
-ACCURACY_METRIC = auc
+ACCURACY_METRIC = binary_accuracy
 
 
 def run_experiments():
@@ -61,10 +61,10 @@ def run_experiments():
 
 
 def plot():
-    svm_results = read_result_from_file('svm_18-04-2020_17-17.txt')
-    reweighing_results = read_result_from_file('svm_reweighing_21-04-2020_05-24.txt')
-    dir_results = read_result_from_file('svm_dir_21-04-2020_09-00.txt')
-    optimpreproc_results = read_result_from_file('svm_optimpreproc_20-04-2020_14-54.txt')
+    svm_results = read_result_from_file('svm_21-04-2020_10-52.txt')
+    reweighing_results = read_result_from_file('svm_reweighing_21-04-2020_11-07.txt')
+    dir_results = read_result_from_file('svm_dir_21-04-2020_11-27.txt')
+    optimpreproc_results = read_result_from_file('svm_optimpreproc_21-04-2020_11-29.txt')
 
     plot_results([svm_results, reweighing_results, dir_results, optimpreproc_results])
 

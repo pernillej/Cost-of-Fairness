@@ -39,8 +39,11 @@ def svm(dataset, fairness_metric, accuracy_metric, C, gamma, keep_features, priv
 
     # Test
     pos_ind = np.where(clf.classes_ == dataset_orig_train.favorable_label)[0][0]  # positive class index
-    dataset_orig_test_pred.labels = clf.predict(X_test)
     dataset_orig_test_pred.scores = clf.predict_proba(X_test)[:, pos_ind].reshape(-1, 1)
+    # Assign labels
+    fav_inds = dataset_orig_test_pred.scores > 0.5
+    dataset_orig_test_pred.labels[fav_inds] = dataset_orig_test_pred.favorable_label
+    dataset_orig_test_pred.labels[~fav_inds] = dataset_orig_test_pred.unfavorable_label
 
     # Calculate metrics
     cm = ClassificationMetric(dataset_orig_test, dataset_orig_test_pred,
@@ -90,8 +93,11 @@ def svm_reweighing(dataset, fairness_metric, accuracy_metric, C, gamma, keep_fea
 
     # Test
     pos_ind = np.where(clf.classes_ == dataset_orig_train.favorable_label)[0][0]  # positive class index
-    dataset_transf_test_pred.labels = clf.predict(X_test)
     dataset_transf_test_pred.scores = clf.predict_proba(X_test)[:, pos_ind].reshape(-1, 1)
+    # Assign labels
+    fav_inds = dataset_transf_test_pred.scores > 0.5
+    dataset_transf_test_pred.labels[fav_inds] = dataset_transf_test_pred.favorable_label
+    dataset_transf_test_pred.labels[~fav_inds] = dataset_transf_test_pred.unfavorable_label
 
     # Calculate metrics
     cm = ClassificationMetric(dataset_orig_test, dataset_transf_test_pred,
@@ -141,8 +147,11 @@ def svm_dir(dataset, fairness_metric, accuracy_metric, C, gamma, keep_features, 
 
     # Test
     pos_ind = np.where(clf.classes_ == dataset_orig_train.favorable_label)[0][0]  # positive class index
-    dataset_transf_test_pred.labels = clf.predict(X_test)
     dataset_transf_test_pred.scores = clf.predict_proba(X_test)[:, pos_ind].reshape(-1, 1)
+    # Assign labels
+    fav_inds = dataset_transf_test_pred.scores > 0.5
+    dataset_transf_test_pred.labels[fav_inds] = dataset_transf_test_pred.favorable_label
+    dataset_transf_test_pred.labels[~fav_inds] = dataset_transf_test_pred.unfavorable_label
 
     # Calculate metrics
     cm = ClassificationMetric(dataset_orig_test, dataset_transf_test_pred,

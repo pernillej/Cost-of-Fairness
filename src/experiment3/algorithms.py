@@ -176,7 +176,8 @@ def svm_dir(dataset, fairness_metric, accuracy_metric, C, gamma, keep_features, 
     dataset_transf_test_pred.scores = clf.predict_proba(X_test)[:, pos_ind].reshape(-1, 1)
     # Assign labels using the classification thresholds
     for i in range(len(dataset_transf_test_pred.labels)):
-        if dataset_transf_test_pred.features[i][4] == 1.:  # Privileged
+        # 4 = index of the sensitive attr, 1 = privileged value
+        if dataset_transf_test_pred.features[i][4] == 1.:  # Privileged,
             if dataset_transf_test_pred.scores[i] > privileged_threshold:  # Above threshold
                 dataset_transf_test_pred.labels[i] = dataset_transf_test_pred.favorable_label
             else:

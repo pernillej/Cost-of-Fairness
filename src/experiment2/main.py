@@ -12,8 +12,8 @@ from src.experiment2.reweighing import svm_reweighing_experiment
 Configuration
 """
 
-NUM_GENERATIONS = 10
-POPULATION_SIZE = 10
+NUM_GENERATIONS = 100
+POPULATION_SIZE = 50
 MUTATION_RATE = 0.05
 CROSSOVER_RATE = 0.7
 CHROMOSOME_LENGTH = 35 + 57  # 15 each for C and gamma, 5 for the classification threshold,
@@ -24,7 +24,7 @@ OPTIM_PREPROC_DATA_SET = load_preproc_data_german()
 PRIVILEGED_GROUPS = [{'age': 1}]
 UNPRIVILEGED_GROUPS = [{'age': 0}]
 FAIRNESS_METRIC = statistical_parity_difference
-ACCURACY_METRIC = auc
+ACCURACY_METRIC = binary_accuracy
 
 
 def run_experiments():

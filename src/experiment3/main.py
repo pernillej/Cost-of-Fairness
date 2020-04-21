@@ -13,8 +13,8 @@ from src.experiment3.optimpreproc import svm_optimpreproc_experiment
 Configuration
 """
 
-NUM_GENERATIONS = 10
-POPULATION_SIZE = 20
+NUM_GENERATIONS = 100
+POPULATION_SIZE = 50
 MUTATION_RATE = 0.05
 CROSSOVER_RATE = 0.7
 CHROMOSOME_LENGTH = 40 + 57  # 15 each for C and gamma, 5 for each of the classification thresholds,
@@ -25,7 +25,7 @@ OPTIM_PREPROC_DATA_SET = load_preproc_data_german()
 PRIVILEGED_GROUPS = [{'age': 1}]
 UNPRIVILEGED_GROUPS = [{'age': 0}]
 FAIRNESS_METRIC = statistical_parity_difference
-ACCURACY_METRIC = auc
+ACCURACY_METRIC = binary_accuracy
 
 
 def run_experiments():

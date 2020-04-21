@@ -13,8 +13,8 @@ from src.metrics import statistical_parity_difference, theil_index, disparate_im
 Configuration
 """
 
-NUM_GENERATIONS = 10
-POPULATION_SIZE = 10
+NUM_GENERATIONS = 100
+POPULATION_SIZE = 50
 MUTATION_RATE = 0.05
 CROSSOVER_RATE = 0.7
 CHROMOSOME_LENGTH = 30 + 57  # 15 each for C and gamma, + 57 for the number of features in german data set
@@ -69,6 +69,6 @@ def plot():
     plot_results([svm_results, reweighing_results, dir_results, optimpreproc_results])
 
 
-# run_experiments()
-plot()
+run_experiments()
+# plot()
 

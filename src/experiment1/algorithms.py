@@ -153,7 +153,8 @@ def svm_dir(dataset, fairness_metric, accuracy_metric, C, gamma, keep_features, 
     return accuracy_score, fairness_score
 
 
-def svm_optimpreproc(dataset, fairness_metric, accuracy_metric, C, gamma, privileged_groups, unprivileged_groups):
+def svm_optimpreproc(dataset, fairness_metric, accuracy_metric, C, gamma, keep_features, privileged_groups,
+                     unprivileged_groups):
     """
     Run SVM classifier with Optimized Preprocessing method on specified data set,
     with provided parameters, and calculate fitness scores.
@@ -169,7 +170,8 @@ def svm_optimpreproc(dataset, fairness_metric, accuracy_metric, C, gamma, privil
     :return:
     """
     return svm(dataset=dataset, fairness_metric=fairness_metric, accuracy_metric=accuracy_metric, C=C, gamma=gamma,
-               keep_features=[], privileged_groups=privileged_groups, unprivileged_groups=unprivileged_groups)
+               keep_features=keep_features, privileged_groups=privileged_groups,
+               unprivileged_groups=unprivileged_groups)
 
 
 

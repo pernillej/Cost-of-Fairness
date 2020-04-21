@@ -1,5 +1,5 @@
 from src.nsga2.nsga2 import nsga2
-from src.nsga2.population import get_C, get_gamma
+from src.nsga2.population import get_C, get_gamma, get_selected_features
 from src.metrics import function_name_to_string
 from src.experiment1.algorithms import svm_optimpreproc
 from src.util.filehandler import write_result_to_file
@@ -43,9 +43,11 @@ def svm_optimpreproc_experiment(num_generations, population_size, mutation_rate,
         else:
             C = get_C(chromosome)
             gamma = get_gamma(chromosome)
+            selected_features = get_selected_features(chromosome, 30)
             accuracy_score, fairness_score = svm_optimpreproc(dataset=data_set, fairness_metric=fairness_metric,
                                                               accuracy_metric=accuracy_metric,
-                                                              C=C, gamma=gamma, privileged_groups=privileged_groups,
+                                                              C=C, gamma=gamma, keep_features=selected_features,
+                                                              privileged_groups=privileged_groups,
                                                               unprivileged_groups=unprivileged_groups)
             FITNESS_SCORES[str(chromosome)] = [accuracy_score, fairness_score]
             return [accuracy_score, fairness_score]

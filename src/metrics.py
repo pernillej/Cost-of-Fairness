@@ -1,3 +1,28 @@
+from sklearn.metrics import roc_auc_score
+
+
+def auc(classification_metric):
+    """
+    Calculate the ROC curve AUC score.
+
+    :param classification_metric: aif369 ClassificationMetric type containing the true, and the predicted data sets
+    :return: The AUC score
+    """
+    y_true = classification_metric.dataset.labels
+    y_pred = classification_metric.classified_dataset.scores
+    return roc_auc_score(y_true, y_pred)
+
+
+def binary_accuracy(classification_metric):
+    """
+    Calculate the built in accuracy score from aif360. 𝐴𝐶𝐶=(𝑇𝑃+𝑇𝑁)/(𝑃+𝑁)
+
+    :param classification_metric: aif369 ClassificationMetric type containing the true, and the predicted data sets
+    :return: The accuracy score
+    """
+    return classification_metric.accuracy()
+
+
 def statistical_parity_difference(classification_metric):
     """
     Calculate statistical parity score: 1 - |Statistical Parity Difference|
@@ -69,3 +94,7 @@ def function_name_to_string(func):
         return "Disparate Impact"
     if func == average_odds_difference:
         return "Average Odds Difference"
+    if func == auc:
+        return "AUC"
+    if func == binary_accuracy:
+        return "Binary Accuracy"

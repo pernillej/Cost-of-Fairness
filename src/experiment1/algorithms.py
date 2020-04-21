@@ -5,12 +5,13 @@ from aif360.metrics import ClassificationMetric
 import numpy as np
 
 
-def svm(dataset, fairness_metric, C, gamma, keep_features, privileged_groups, unprivileged_groups):
+def svm(dataset, fairness_metric, accuracy_metric, C, gamma, keep_features, privileged_groups, unprivileged_groups):
     """
     Run SVM(SVC) classifier on specified data set, with provided parameters, and calculate fitness scores.
 
     :param dataset: The data set to run the classifier on
     :param fairness_metric: The fairness metric to calculate
+    :param accuracy_metric: The accuracy metric to calculate
     :param C: The C parameter for SVC
     :param gamma: The gamma parameter for SVC
     :param keep_features: The features to keep for SVC
@@ -44,18 +45,20 @@ def svm(dataset, fairness_metric, C, gamma, keep_features, privileged_groups, un
     # Calculate metrics
     cm = ClassificationMetric(dataset_orig_test, dataset_orig_test_pred,
                               unprivileged_groups=unprivileged_groups, privileged_groups=privileged_groups)
-    accuracy_score = cm.accuracy()
+    accuracy_score = accuracy_metric(cm)
     fairness_score = fairness_metric(cm)
     return accuracy_score, fairness_score
 
 
-def svm_reweighing(dataset, fairness_metric, C, gamma, keep_features, privileged_groups, unprivileged_groups):
+def svm_reweighing(dataset, fairness_metric, accuracy_metric, C, gamma, keep_features, privileged_groups,
+                   unprivileged_groups):
     """
     Run SVM classifier with Reweighing preprocessing on specified data set,
     with provided parameters, and calculate fitness scores.
 
     :param dataset: The data set to run the classifier on
     :param fairness_metric: The fairness metric to calculate
+    :param accuracy_metric: The accuracy metric to calculate
     :param C: The C parameter for SVC
     :param gamma: The gamma parameter for SVC
     :param keep_features: The features to keep for SVC
@@ -94,18 +97,19 @@ def svm_reweighing(dataset, fairness_metric, C, gamma, keep_features, privileged
     cm = ClassificationMetric(dataset_orig_test, dataset_transf_test_pred,
                               unprivileged_groups=unprivileged_groups, privileged_groups=privileged_groups)
 
-    accuracy_score = cm.accuracy()
+    accuracy_score = accuracy_metric(cm)
     fairness_score = fairness_metric(cm)
     return accuracy_score, fairness_score
 
 
-def svm_dir(dataset, fairness_metric, C, gamma, keep_features, privileged_groups, unprivileged_groups):
+def svm_dir(dataset, fairness_metric, accuracy_metric, C, gamma, keep_features, privileged_groups, unprivileged_groups):
     """
     Run SVM classifier with Disparate Impact Remover preprocessing on specified data set,
     with provided parameters, and calculate fitness scores.
 
     :param dataset: The data set to run the classifier on
     :param fairness_metric: The fairness metric to calculate
+    :param accuracy_metric: The accuracy metric to calculate
     :param C: The C parameter for SVC
     :param gamma: The gamma parameter for SVC
     :param keep_features: The features to keep for SVC
@@ -144,18 +148,19 @@ def svm_dir(dataset, fairness_metric, C, gamma, keep_features, privileged_groups
     cm = ClassificationMetric(dataset_orig_test, dataset_transf_test_pred,
                               unprivileged_groups=unprivileged_groups, privileged_groups=privileged_groups)
 
-    accuracy_score = cm.accuracy()
+    accuracy_score = accuracy_metric(cm)
     fairness_score = fairness_metric(cm)
     return accuracy_score, fairness_score
 
 
-def svm_optimpreproc(dataset, fairness_metric, C, gamma, privileged_groups, unprivileged_groups):
+def svm_optimpreproc(dataset, fairness_metric, accuracy_metric, C, gamma, privileged_groups, unprivileged_groups):
     """
     Run SVM classifier with Optimized Preprocessing method on specified data set,
     with provided parameters, and calculate fitness scores.
 
     :param dataset: The data set to run the classifier on
     :param fairness_metric: The fairness metric to calculate
+    :param accuracy_metric: The accuracy metric to calculate
     :param C: The C parameter for SVC
     :param gamma: The gamma parameter for SVC
     :param keep_features: The features to keep for SVC
@@ -163,8 +168,8 @@ def svm_optimpreproc(dataset, fairness_metric, C, gamma, privileged_groups, unpr
     :param unprivileged_groups: The unprivileged group in the data set
     :return:
     """
-    return svm(dataset=dataset, fairness_metric=fairness_metric, C=C, gamma=gamma, keep_features=[],
-               privileged_groups=privileged_groups, unprivileged_groups=unprivileged_groups)
+    return svm(dataset=dataset, fairness_metric=fairness_metric, accuracy_metric=accuracy_metric, C=C, gamma=gamma,
+               keep_features=[], privileged_groups=privileged_groups, unprivileged_groups=unprivileged_groups)
 
 
 

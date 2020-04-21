@@ -6,7 +6,7 @@ from src.util.filehandler import write_result_to_file
 
 
 def svm_reweighing_experiment(num_generations, population_size, mutation_rate, crossover_rate, chromosome_length,
-                              fairness_metric, data_set, privileged_groups, unprivileged_groups):
+                              fairness_metric, accuracy_metric, data_set, privileged_groups, unprivileged_groups):
     """
     SVM with Reweighing experiment.
 
@@ -16,6 +16,7 @@ def svm_reweighing_experiment(num_generations, population_size, mutation_rate, c
     :param crossover_rate: Crossover probability for NSGA-II
     :param chromosome_length: Length of chromosome used in NSGA-II
     :param fairness_metric: Fairness metric used to calculate the fairness score
+    :param accuracy_metric: Accuracy metric used to calculate the accuracy score
     :param data_set: The data set to run experiment on
     :param privileged_groups: The privileged groups in the data set
     :param unprivileged_groups: The unprivileged groups in the data set
@@ -39,6 +40,7 @@ def svm_reweighing_experiment(num_generations, population_size, mutation_rate, c
             gamma = get_gamma(chromosome)
             selected_features = get_selected_features(chromosome, 30)
             accuracy_score, fairness_score = svm_reweighing(dataset=data_set, fairness_metric=fairness_metric,
+                                                            accuracy_metric=accuracy_metric,
                                                             C=C, gamma=gamma, keep_features=selected_features,
                                                             privileged_groups=privileged_groups,
                                                             unprivileged_groups=unprivileged_groups)
@@ -57,6 +59,7 @@ def svm_reweighing_experiment(num_generations, population_size, mutation_rate, c
     result_summary = {'name': 'SVM_Reweighing',
                       'result': result,
                       'fairness_metric': function_name_to_string(fairness_metric),
+                      'accuracy_metric': function_name_to_string(accuracy_metric),
                       'nsga2_parameters': {'num_generations': num_generations, 'population_size': population_size,
                                            'crossover_rate': crossover_rate, 'mutation_rate': mutation_rate,
                                            'chromosome_length': chromosome_length}}

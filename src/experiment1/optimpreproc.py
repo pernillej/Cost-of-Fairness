@@ -11,7 +11,7 @@ FITNESS_SCORES = {}
 
 
 def svm_optimpreproc_experiment(num_generations, population_size, mutation_rate, crossover_rate, chromosome_length,
-                                fairness_metric, data_set, privileged_groups, unprivileged_groups):
+                                fairness_metric, accuracy_metric, data_set, privileged_groups, unprivileged_groups):
     """
     SVM with Optimized Preprocessing experiment.
 
@@ -21,6 +21,7 @@ def svm_optimpreproc_experiment(num_generations, population_size, mutation_rate,
     :param crossover_rate: Crossover probability for NSGA-II
     :param chromosome_length: Length of chromosome used in NSGA-II
     :param fairness_metric: Fairness metric used to calculate the fairness score
+    :param accuracy_metric: Accuracy metric used to calculate the accuracy score
     :param data_set: The data set to run experiment on
     :param privileged_groups: The privileged groups in the data set
     :param unprivileged_groups: The unprivileged groups in the data set
@@ -43,6 +44,7 @@ def svm_optimpreproc_experiment(num_generations, population_size, mutation_rate,
             C = get_C(chromosome)
             gamma = get_gamma(chromosome)
             accuracy_score, fairness_score = svm_optimpreproc(dataset=data_set, fairness_metric=fairness_metric,
+                                                              accuracy_metric=accuracy_metric,
                                                               C=C, gamma=gamma, privileged_groups=privileged_groups,
                                                               unprivileged_groups=unprivileged_groups)
             FITNESS_SCORES[str(chromosome)] = [accuracy_score, fairness_score]
@@ -60,6 +62,7 @@ def svm_optimpreproc_experiment(num_generations, population_size, mutation_rate,
     result_summary = {'name': 'SVM_OptimPreProc',
                       'result': result,
                       'fairness_metric': function_name_to_string(fairness_metric),
+                      'accuracy_metric': function_name_to_string(accuracy_metric),
                       'nsga2_parameters': {'num_generations': num_generations, 'population_size': population_size,
                                            'crossover_rate': crossover_rate, 'mutation_rate': mutation_rate,
                                            'chromosome_length': chromosome_length}}

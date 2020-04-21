@@ -3,7 +3,6 @@ import numpy as np
 
 
 def plot_result(result, label, show=False):
-    # TODO: Update to proper plotting
     scores = sort_results_for_plotting(list(result.values()))
     scores = np.array(scores)
     x = scores[:, 0]
@@ -15,7 +14,7 @@ def plot_result(result, label, show=False):
 
 
 def plot_results(result_summaries):
-    x_label = 'accuracy'
+    x_label = result_summaries[0]["accuracy_metric"]
     y_label = "1 - " + result_summaries[0]["fairness_metric"]
     plt.xlabel(x_label)
     plt.ylabel(y_label)

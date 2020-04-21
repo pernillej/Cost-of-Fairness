@@ -125,6 +125,7 @@ def get_selected_features(chromosome, start_index):
     """
     return np.where(chromosome[start_index:] == 1)[0]
 
-def get_classification_threshold(chromosome):
-    thresh = from_binary_to_float_in_range(chromosome[30:35], 2, [-4, 0])
+
+def get_classification_threshold(chromosome, start_index, stop_index):
+    thresh = from_binary_to_float_in_range(chromosome[start_index:stop_index], 2, [-4, 0])
     return thresh

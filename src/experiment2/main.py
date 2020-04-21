@@ -9,10 +9,6 @@ from src.experiment2.optimpreproc import svm_optimpreproc_experiment
 from src.experiment2.reweighing import svm_reweighing_experiment
 
 """
-TODO: Expand experiment 1 to add a classification threshold
-"""
-
-"""
 Configuration
 """
 

@@ -43,7 +43,7 @@ def svm_experiment(num_generations, population_size, mutation_rate, crossover_ra
             C = get_C(chromosome)
             gamma = get_gamma(chromosome)
             selected_features = get_selected_features(chromosome, 35)
-            classification_threshold = get_classification_threshold(chromosome)
+            classification_threshold = get_classification_threshold(chromosome, 30, 35)
             accuracy_score, fairness_score = svm(dataset=data_set, fairness_metric=fairness_metric,
                                                  accuracy_metric=accuracy_metric,
                                                  C=C, gamma=gamma, keep_features=selected_features,

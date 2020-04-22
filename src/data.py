@@ -20,15 +20,12 @@ def load_german_dataset():
 def load_compas_dataset():
     """
     Collect the aif360 preprocessed Compas Data Set.
-    Assigns 'race' as the protected attribute with Caucasian considered privileged.
-    Sex-related attributes are removed (the other option for privileged attribute)
+    Charge descriptions are removed.
 
     :return: The Compas Dataset
     """
     dataset = CompasDataset(
-        protected_attribute_names=['race'],
-        privileged_classes=[['Caucasian']],
-        features_to_drop=['sex']
+        features_to_drop=['c_charge_desc']  # Drop charge description, unnecessarily overloads the dataset
     )
     return dataset
 

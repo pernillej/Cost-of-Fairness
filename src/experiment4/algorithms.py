@@ -3,10 +3,13 @@ from sklearn.preprocessing import StandardScaler
 from aif360.algorithms.preprocessing import Reweighing, DisparateImpactRemover
 from aif360.metrics import ClassificationMetric
 import numpy as np
+from sklearn.utils.testing import ignore_warnings
+from sklearn.exceptions import ConvergenceWarning
 
 MAX_ITER = 10000
 
 
+@ignore_warnings(category=ConvergenceWarning)
 def svm(dataset, fairness_metric, accuracy_metric, C, gamma, keep_features, privileged_groups, unprivileged_groups):
     """
     Run SVM(SVC) classifier on specified data set, with provided parameters, and calculate fitness scores.
@@ -55,6 +58,7 @@ def svm(dataset, fairness_metric, accuracy_metric, C, gamma, keep_features, priv
     return accuracy_score, fairness_score
 
 
+@ignore_warnings(category=ConvergenceWarning)
 def svm_reweighing(dataset, fairness_metric, accuracy_metric, C, gamma, keep_features, privileged_groups,
                    unprivileged_groups):
     """
@@ -110,6 +114,7 @@ def svm_reweighing(dataset, fairness_metric, accuracy_metric, C, gamma, keep_fea
     return accuracy_score, fairness_score
 
 
+@ignore_warnings(category=ConvergenceWarning)
 def svm_dir(dataset, fairness_metric, accuracy_metric, C, gamma, keep_features, privileged_groups, unprivileged_groups):
     """
     Run SVM classifier with Disparate Impact Remover preprocessing on specified data set,
@@ -164,6 +169,7 @@ def svm_dir(dataset, fairness_metric, accuracy_metric, C, gamma, keep_features, 
     return accuracy_score, fairness_score
 
 
+@ignore_warnings(category=ConvergenceWarning)
 def svm_optimpreproc(dataset, fairness_metric, accuracy_metric, C, gamma, keep_features, privileged_groups,
                      unprivileged_groups):
     """

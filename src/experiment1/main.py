@@ -67,10 +67,10 @@ def run_experiments():
 def plot():
     svm_results = read_result_from_file('svm_24-04-2020_10-08.txt')
     reweighing_results = read_result_from_file('svm_reweighing_24-04-2020_12-30.txt')
-    dir_results = read_result_from_file('svm_dir_24-04-2020_14-27.txt')
-    # optimpreproc_results = read_result_from_file('svm_optimpreproc_21-04-2020_11-29.txt')
+    dir_results = read_result_from_file('svm_dir_24-04-2020_16-22.txt')
+    optimpreproc_results = read_result_from_file('svm_optimpreproc_24-04-2020_18-33.txt')
 
-    plot_results([svm_results, reweighing_results, dir_results])
+    plot_results([svm_results, reweighing_results, dir_results, optimpreproc_results])
 
 
 run_experiments()

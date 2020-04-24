@@ -3,18 +3,13 @@ from sklearn.preprocessing import StandardScaler
 from aif360.algorithms.preprocessing import Reweighing, DisparateImpactRemover
 from aif360.metrics import ClassificationMetric
 import numpy as np
-from sklearn.utils.testing import ignore_warnings
-from sklearn.exceptions import ConvergenceWarning
 
 
-@ignore_warnings(category=ConvergenceWarning)
-def svm(training_data, test_data, fairness_metric, accuracy_metric, C, gamma, keep_features, privileged_groups,
-        unprivileged_groups, max_iter, svm_seed):
+def svm(dataset, fairness_metric, accuracy_metric, C, gamma, keep_features, privileged_groups, unprivileged_groups):
     """
     Run SVM(SVC) classifier on specified data set, with provided parameters, and calculate fitness scores.
 
-    :param training_data: The training data set to run the classifier on
-    :param test_data: The test data set to test the classifier on
+    :param dataset: The data set to run the classifier on
     :param fairness_metric: The fairness metric to calculate
     :param accuracy_metric: The accuracy metric to calculate
     :param C: The C parameter for SVC
@@ -22,11 +17,10 @@ def svm(training_data, test_data, fairness_metric, accuracy_metric, C, gamma, ke
     :param keep_features: The features to keep for SVC
     :param privileged_groups: The privileged group in the data set
     :param unprivileged_groups: The unprivileged group in the data set
-    :param max_iter: Max iterations for SVM
-    :param svm_seed: Seed used for RNG in SVM
     :return:
     """
-    dataset_orig_train, dataset_orig_test = training_data, test_data
+    # Split dataset
+    dataset_orig_train, dataset_orig_test = dataset.split([0.8], shuffle=True)
 
     # Prepare data
     scale = StandardScaler()
@@ -40,7 +34,7 @@ def svm(training_data, test_data, fairness_metric, accuracy_metric, C, gamma, ke
         X_test = X_test[:, keep_features]
 
     # Train
-    clf = SVC(C=C, gamma=gamma, kernel='rbf', probability=True, max_iter=max_iter, random_state=svm_seed)
+    clf = SVC(C=C, gamma=gamma, kernel='rbf', probability=True)
     clf.fit(X_train, y_train, sample_weight=w_train)
 
     # Test
@@ -59,15 +53,13 @@ def svm(training_data, test_data, fairness_metric, accuracy_metric, C, gamma, ke
     return accuracy_score, fairness_score
 
 
-@ignore_warnings(category=ConvergenceWarning)
-def svm_reweighing(training_data, test_data, fairness_metric, accuracy_metric, C, gamma, keep_features,
-                   privileged_groups, unprivileged_groups, max_iter, svm_seed):
+def svm_reweighing(dataset, fairness_metric, accuracy_metric, C, gamma, keep_features, privileged_groups,
+                   unprivileged_groups):
     """
     Run SVM classifier with Reweighing preprocessing on specified data set,
     with provided parameters, and calculate fitness scores.
 
-    :param training_data: The training data set to run the classifier on
-    :param test_data: The test data set to test the classifier on
+    :param dataset: The data set to run the classifier on
     :param fairness_metric: The fairness metric to calculate
     :param accuracy_metric: The accuracy metric to calculate
     :param C: The C parameter for SVC
@@ -75,11 +67,10 @@ def svm_reweighing(training_data, test_data, fairness_metric, accuracy_metric, C
     :param keep_features: The features to keep for SVC
     :param privileged_groups: The privileged group in the data set
     :param unprivileged_groups: The unprivileged group in the data set
-    :param max_iter: Max iterations for SVM
-    :param svm_seed: Seed used for RNG in SVM
     :return:
     """
-    dataset_orig_train, dataset_orig_test = training_data, test_data
+    # Split dataset
+    dataset_orig_train, dataset_orig_test = dataset.split([0.8], shuffle=True)
 
     # Run Reweighing
     rw = Reweighing(privileged_groups=privileged_groups, unprivileged_groups=unprivileged_groups)
@@ -97,7 +88,7 @@ def svm_reweighing(training_data, test_data, fairness_metric, accuracy_metric, C
         X_test = X_test[:, keep_features]
 
     # Train
-    clf = SVC(C=C, gamma=gamma, kernel='rbf', probability=True, max_iter=max_iter, random_state=svm_seed)
+    clf = SVC(C=C, gamma=gamma, kernel='rbf', probability=True)
     clf.fit(X_train, y_train, sample_weight=w_train)
 
     # Test
@@ -117,15 +108,12 @@ def svm_reweighing(training_data, test_data, fairness_metric, accuracy_metric, C
     return accuracy_score, fairness_score
 
 
-@ignore_warnings(category=ConvergenceWarning)
-def svm_dir(training_data, test_data, fairness_metric, accuracy_metric, C, gamma, keep_features, privileged_groups,
-            unprivileged_groups, max_iter, svm_seed):
+def svm_dir(dataset, fairness_metric, accuracy_metric, C, gamma, keep_features, privileged_groups, unprivileged_groups):
     """
     Run SVM classifier with Disparate Impact Remover preprocessing on specified data set,
     with provided parameters, and calculate fitness scores.
 
-    :param training_data: The training data set to run the classifier on
-    :param test_data: The test data set to test the classifier on
+    :param dataset: The data set to run the classifier on
     :param fairness_metric: The fairness metric to calculate
     :param accuracy_metric: The accuracy metric to calculate
     :param C: The C parameter for SVC
@@ -133,14 +121,13 @@ def svm_dir(training_data, test_data, fairness_metric, accuracy_metric, C, gamma
     :param keep_features: The features to keep for SVC
     :param privileged_groups: The privileged group in the data set
     :param unprivileged_groups: The unprivileged group in the data set
-    :param max_iter: Max iterations for SVM
-    :param svm_seed: Seed used for RNG in SVM
     :return:
     """
-    dataset_orig_train, dataset_orig_test = training_data, test_data
+    # Split dataset
+    dataset_orig_train, dataset_orig_test = dataset.split([0.8], shuffle=True)
 
     # Run Disparate Impact Remover
-    di = DisparateImpactRemover(sensitive_attribute='age')
+    di = DisparateImpactRemover(repair_level=0.8, sensitive_attribute='age')
     dataset_transf_train = di.fit_transform(dataset_orig_train)
 
     # Prepare data
@@ -155,7 +142,7 @@ def svm_dir(training_data, test_data, fairness_metric, accuracy_metric, C, gamma
         X_test = X_test[:, keep_features]
 
     # Train
-    clf = SVC(C=C, gamma=gamma, kernel='rbf', probability=True, max_iter=max_iter, random_state=svm_seed)
+    clf = SVC(C=C, gamma=gamma, kernel='rbf', probability=True)
     clf.fit(X_train, y_train, sample_weight=w_train)
 
     # Test
@@ -175,15 +162,13 @@ def svm_dir(training_data, test_data, fairness_metric, accuracy_metric, C, gamma
     return accuracy_score, fairness_score
 
 
-@ignore_warnings(category=ConvergenceWarning)
-def svm_optimpreproc(training_data, test_data, fairness_metric, accuracy_metric, C, gamma, keep_features,
-                     privileged_groups, unprivileged_groups, max_iter, svm_seed):
+def svm_optimpreproc(dataset, fairness_metric, accuracy_metric, C, gamma, keep_features, privileged_groups,
+                     unprivileged_groups):
     """
     Run SVM classifier with Optimized Preprocessing method on specified data set,
     with provided parameters, and calculate fitness scores.
 
-    :param training_data: The training data set to run the classifier on
-    :param test_data: The test data set to test the classifier on
+    :param dataset: The data set to run the classifier on
     :param fairness_metric: The fairness metric to calculate
     :param accuracy_metric: The accuracy metric to calculate
     :param C: The C parameter for SVC
@@ -191,14 +176,11 @@ def svm_optimpreproc(training_data, test_data, fairness_metric, accuracy_metric,
     :param keep_features: The features to keep for SVC
     :param privileged_groups: The privileged group in the data set
     :param unprivileged_groups: The unprivileged group in the data set
-    :param max_iter: Max iterations for SVM
-    :param svm_seed: Seed used for RNG in SVM
     :return:
     """
-    return svm(training_data=training_data, test_data=test_data, fairness_metric=fairness_metric,
-               accuracy_metric=accuracy_metric, C=C, gamma=gamma, keep_features=keep_features,
-               privileged_groups=privileged_groups, unprivileged_groups=unprivileged_groups, max_iter=max_iter,
-               svm_seed=svm_seed)
+    return svm(dataset=dataset, fairness_metric=fairness_metric, accuracy_metric=accuracy_metric, C=C, gamma=gamma,
+               keep_features=keep_features, privileged_groups=privileged_groups,
+               unprivileged_groups=unprivileged_groups)
 
 
 

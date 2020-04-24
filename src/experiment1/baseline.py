@@ -11,7 +11,8 @@ FITNESS_SCORES = {}
 
 
 def svm_experiment(num_generations, population_size, mutation_rate, crossover_rate, chromosome_length,
-                   fairness_metric, accuracy_metric, data_set, privileged_groups, unprivileged_groups):
+                   fairness_metric, accuracy_metric, training_data, test_data, privileged_groups, unprivileged_groups,
+                   max_iter, svm_seed):
     """
     Baseline SVM experiment.
 
@@ -22,9 +23,12 @@ def svm_experiment(num_generations, population_size, mutation_rate, crossover_ra
     :param chromosome_length: Length of chromosome used in NSGA-II
     :param fairness_metric: Fairness metric used to calculate the fairness score
     :param accuracy_metric: Accuracy metric used to calculate the accuracy score
-    :param data_set: The data set to run experiment on
+    :param training_data: The training data set to run experiment on
+    :param test_data: The test data set to test the experiment on
     :param privileged_groups: The privileged groups in the data set
     :param unprivileged_groups: The unprivileged groups in the data set
+    :param max_iter: Max iterations for SVM
+    :param svm_seed: Seed used for RNG in SVM
     :return: Resulting Pareto front
     """
 
@@ -37,6 +41,7 @@ def svm_experiment(num_generations, population_size, mutation_rate, crossover_ra
         :param chromosome: Chromosome to specify parameters for SVM
         :return: The fitness scores in a list: [accuracy_score, fairness_score]
         """
+
         # Check if scores already calculated for identical chromosome, in which case return those scores
         if str(chromosome) in FITNESS_SCORES:
             return FITNESS_SCORES[str(chromosome)]
@@ -44,11 +49,13 @@ def svm_experiment(num_generations, population_size, mutation_rate, crossover_ra
             C = get_C(chromosome)
             gamma = get_gamma(chromosome)
             selected_features = get_selected_features(chromosome, 30)
-            accuracy_score, fairness_score = svm(dataset=data_set, fairness_metric=fairness_metric,
+            accuracy_score, fairness_score = svm(training_data=training_data, test_data=test_data,
+                                                 fairness_metric=fairness_metric,
                                                  accuracy_metric=accuracy_metric,
                                                  C=C, gamma=gamma, keep_features=selected_features,
                                                  privileged_groups=privileged_groups,
-                                                 unprivileged_groups=unprivileged_groups)
+                                                 unprivileged_groups=unprivileged_groups, max_iter=max_iter,
+                                                 svm_seed=svm_seed)
             FITNESS_SCORES[str(chromosome)] = [accuracy_score, fairness_score]
             return [accuracy_score, fairness_score]
 

@@ -1,4 +1,5 @@
 from aif360.datasets import GermanDataset, CompasDataset
+from aif360.algorithms.preprocessing.optim_preproc_helpers.data_preproc_functions import load_preproc_data_compas
 
 
 def load_german_dataset():
@@ -22,12 +23,26 @@ def load_compas_dataset():
     Collect the aif360 preprocessed Compas Data Set.
     Charge descriptions are removed.
 
-    :return: The Compas Dataset
+    :return: The Compas Dataset, split into training and test sets
     """
     dataset = CompasDataset(
-        features_to_drop=['c_charge_desc']  # Drop charge description, unnecessarily overloads the dataset
+        features_to_drop=['c_charge_desc']  # Drop charge description, as they unnecessarily overloads the dataset
     )
-    return dataset
+    ind = int(len(dataset.instance_names) * 0.8)
+    train, test = dataset.split([ind])
+    return train, test
+
+
+def load_optimpreproc_compas_dataset():
+    """
+    Collect the Optimized Preprocessed Compas Data Set.
+
+    :return: The Optimized Preprocessed Compas Dataset, split into training and test sets
+    """
+    dataset = load_preproc_data_compas()
+    ind = int(len(dataset.instance_names)*0.8)
+    train, test = dataset.split([ind])
+    return train, test
 
 
 def to_dataframe(dataset, favorable_label=None, unfavorable_label=None):

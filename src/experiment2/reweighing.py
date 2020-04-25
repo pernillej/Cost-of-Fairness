@@ -54,7 +54,7 @@ def svm_reweighing_experiment(C, gamma, selected_features, num_generations, popu
         if str(chromosome) in FITNESS_SCORES:
             return FITNESS_SCORES[str(chromosome)]
         else:
-            classification_threshold = get_classification_threshold(chromosome, 0, 15)
+            classification_threshold = get_classification_threshold(chromosome, 0, 10)
             accuracy_score, fairness_score = test_classifier(classifier=svm_reweighing_classifier,
                                                              scale=svm_reweighing_scale, test_data=test_data,
                                                              fairness_metric=fairness_metric,

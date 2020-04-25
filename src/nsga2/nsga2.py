@@ -212,7 +212,7 @@ def select_population(population, scores, population_size):
     unselected_population_ids = np.arange(population.shape[0])
     all_population_ids = np.arange(population.shape[0])
     pareto_front = []
-    while len(pareto_front) < population_size:
+    while len(pareto_front) < population_size and len(unselected_population_ids) > 0:
         temp_pareto_front = identify_pareto(
             scores[unselected_population_ids, :], unselected_population_ids)
         # Check size of total pareto front.

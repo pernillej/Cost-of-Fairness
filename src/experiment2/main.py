@@ -1,7 +1,7 @@
 from src.util.plotter import plot_results
 from src.util.filehandler import read_result_from_file
 from src.data import load_compas_dataset, load_optimpreproc_compas_dataset
-from src.metrics import statistical_parity_difference, binary_accuracy
+from src.metrics import statistical_parity_difference, binary_accuracy, theil_index
 from src.experiment2.baseline import svm_experiment
 from src.experiment2.disparate_impact_remover import svm_dir_experiment
 from src.experiment2.optimpreproc import svm_optimpreproc_experiment

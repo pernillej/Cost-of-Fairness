@@ -1,7 +1,7 @@
 from src.nsga2.nsga2 import nsga2
-from src.nsga2.population import get_C, get_gamma, get_selected_features, get_classification_threshold
+from src.nsga2.population import get_classification_threshold
 from src.metrics import function_name_to_string
-from src.experiment2.algorithms import svm_dir
+from src.experiment2.algorithms import train_svm_dir, test_classifier
 from src.util.filehandler import write_result_to_file
 
 """ 
@@ -10,11 +10,15 @@ Collects scores already calculated to remove unnecessary burden of recalculating
 FITNESS_SCORES = {}
 
 
-def svm_dir_experiment(num_generations, population_size, mutation_rate, crossover_rate, chromosome_length,
-                       fairness_metric, accuracy_metric, data_set, privileged_groups, unprivileged_groups):
+def svm_dir_experiment(C, gamma, selected_features, num_generations, population_size, mutation_rate, crossover_rate,
+                       chromosome_length, fairness_metric, accuracy_metric, training_data, test_data, privileged_groups,
+                       unprivileged_groups, max_iter, svm_seed):
     """
     SVM with Disparate Impact Remover experiment.
 
+    :param C: The value for the C parameter of SVM
+    :param gamma: The value for the gamma parameter of SVM
+    :param selected_features: The selected features for SVM
     :param num_generations: Number of generations for NSGA-II
     :param population_size: Population size for NSGA-II
     :param mutation_rate: Mutation rate for NSGA-II
@@ -22,11 +26,20 @@ def svm_dir_experiment(num_generations, population_size, mutation_rate, crossove
     :param chromosome_length: Length of chromosome used in NSGA-II
     :param fairness_metric: Fairness metric used to calculate the fairness score
     :param accuracy_metric: Accuracy metric used to calculate the accuracy score
-    :param data_set: The data set to run experiment on
+    :param training_data: The training data set to run experiment on
+    :param test_data: The test data set to test the experiment on
     :param privileged_groups: The privileged groups in the data set
     :param unprivileged_groups: The unprivileged groups in the data set
+    :param max_iter: Max iterations for SVM
+    :param svm_seed: Seed used for RNG in SVM
     :return: Resulting Pareto front
     """
+    # Train classifier
+    sensitive_attribute = list(privileged_groups[0].keys())[0]
+    svm_dir_classifier, svm_dir_scale = train_svm_dir(training_data=training_data, C=C, gamma=gamma,
+                                                      keep_features=selected_features, max_iter=max_iter,
+                                                      svm_seed=svm_seed, sensitive_attribute=sensitive_attribute)
+
     # Defines the evaluation function
     def evaluation_function(chromosome):
         """
@@ -41,16 +54,14 @@ def svm_dir_experiment(num_generations, population_size, mutation_rate, crossove
         if str(chromosome) in FITNESS_SCORES:
             return FITNESS_SCORES[str(chromosome)]
         else:
-            C = get_C(chromosome)
-            gamma = get_gamma(chromosome)
-            selected_features = get_selected_features(chromosome, 35)
-            classification_threshold = get_classification_threshold(chromosome, 30, 35)
-            accuracy_score, fairness_score = svm_dir(dataset=data_set, fairness_metric=fairness_metric,
-                                                     accuracy_metric=accuracy_metric,
-                                                     C=C, gamma=gamma, keep_features=selected_features,
-                                                     classification_threshold=classification_threshold,
-                                                     privileged_groups=privileged_groups,
-                                                     unprivileged_groups=unprivileged_groups)
+            classification_threshold = get_classification_threshold(chromosome, 0, 15)
+            accuracy_score, fairness_score = test_classifier(classifier=svm_dir_classifier, scale=svm_dir_scale,
+                                                             test_data=test_data, fairness_metric=fairness_metric,
+                                                             accuracy_metric=accuracy_metric,
+                                                             keep_features=selected_features,
+                                                             classification_threshold=classification_threshold,
+                                                             privileged_groups=privileged_groups,
+                                                             unprivileged_groups=unprivileged_groups)
             FITNESS_SCORES[str(chromosome)] = [accuracy_score, fairness_score]
             return [accuracy_score, fairness_score]
 

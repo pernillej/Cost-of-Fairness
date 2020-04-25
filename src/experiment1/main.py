@@ -28,6 +28,7 @@ ACCURACY_METRIC = binary_accuracy
 
 
 def run_experiments():
+    """
     print("Running SVM")
     result = svm_experiment(num_generations=NUM_GENERATIONS, population_size=POPULATION_SIZE,
                             mutation_rate=MUTATION_RATE, crossover_rate=CROSSOVER_RATE,
@@ -45,6 +46,7 @@ def run_experiments():
                                        unprivileged_groups=UNPRIVILEGED_GROUPS, max_iter=SVM_MAX_ITER,
                                        svm_seed=SVM_SEED)
     print('Results: ' + str(result))
+    """
     print("Running SVM with DisparateImpactRemover")
     result = svm_dir_experiment(num_generations=NUM_GENERATIONS, population_size=POPULATION_SIZE,
                                 mutation_rate=MUTATION_RATE, crossover_rate=CROSSOVER_RATE,
@@ -53,6 +55,7 @@ def run_experiments():
                                 privileged_groups=PRIVILEGED_GROUPS, unprivileged_groups=UNPRIVILEGED_GROUPS,
                                 max_iter=SVM_MAX_ITER, svm_seed=SVM_SEED)
     print('Results: ' + str(result))
+    """
     print("Running SVM with Optimized Preprocessing")
     result = svm_optimpreproc_experiment(num_generations=NUM_GENERATIONS, population_size=POPULATION_SIZE,
                                          mutation_rate=MUTATION_RATE, crossover_rate=CROSSOVER_RATE,
@@ -62,15 +65,21 @@ def run_experiments():
                                          privileged_groups=PRIVILEGED_GROUPS, unprivileged_groups=UNPRIVILEGED_GROUPS,
                                          max_iter=SVM_MAX_ITER, svm_seed=SVM_SEED)
     print('Results: ' + str(result))
+    """
 
 
 def plot():
     svm_results = read_result_from_file('svm_24-04-2020_10-08.txt')
+    svm_results1 = read_result_from_file('svm_24-04-2020_20-59.txt')
     reweighing_results = read_result_from_file('svm_reweighing_24-04-2020_12-30.txt')
+    reweighing_results1 = read_result_from_file('svm_reweighing_24-04-2020_23-07.txt')
     dir_results = read_result_from_file('svm_dir_24-04-2020_16-22.txt')
+    dir_results1 = read_result_from_file('svm_dir_25-04-2020_00-51.txt')
     optimpreproc_results = read_result_from_file('svm_optimpreproc_24-04-2020_18-33.txt')
+    optimpreproc_results1 = read_result_from_file('svm_optimpreproc_25-04-2020_02-16.txt')
 
-    plot_results([svm_results, reweighing_results, dir_results, optimpreproc_results])
+    plot_results([svm_results, svm_results1, reweighing_results, reweighing_results1, dir_results, dir_results1,
+                  optimpreproc_results, optimpreproc_results1])
 
 
 run_experiments()

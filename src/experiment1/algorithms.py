@@ -24,7 +24,7 @@ def svm(training_data, test_data, fairness_metric, accuracy_metric, C, gamma, ke
     :param unprivileged_groups: The unprivileged group in the data set
     :param max_iter: Max iterations for SVM
     :param svm_seed: Seed used for RNG in SVM
-    :return:
+    :return: Return the accuracy and fairness score for the classifier
     """
     dataset_orig_train, dataset_orig_test = training_data, test_data
 
@@ -77,7 +77,7 @@ def svm_reweighing(training_data, test_data, fairness_metric, accuracy_metric, C
     :param unprivileged_groups: The unprivileged group in the data set
     :param max_iter: Max iterations for SVM
     :param svm_seed: Seed used for RNG in SVM
-    :return:
+    :return: Return the accuracy and fairness score for the classifier
     """
     dataset_orig_train, dataset_orig_test = training_data, test_data
 
@@ -135,12 +135,13 @@ def svm_dir(training_data, test_data, fairness_metric, accuracy_metric, C, gamma
     :param unprivileged_groups: The unprivileged group in the data set
     :param max_iter: Max iterations for SVM
     :param svm_seed: Seed used for RNG in SVM
-    :return:
+    :return: Return the accuracy and fairness score for the classifier
     """
     dataset_orig_train, dataset_orig_test = training_data, test_data
 
     # Run Disparate Impact Remover
-    di = DisparateImpactRemover(repair_level=0.8, sensitive_attribute='age')
+    sensitive_attribute = list(privileged_groups[0].keys())[0]
+    di = DisparateImpactRemover(repair_level=0.8, sensitive_attribute=sensitive_attribute)
     dataset_transf_train = di.fit_transform(dataset_orig_train)
 
     # Prepare data
@@ -193,7 +194,7 @@ def svm_optimpreproc(training_data, test_data, fairness_metric, accuracy_metric,
     :param unprivileged_groups: The unprivileged group in the data set
     :param max_iter: Max iterations for SVM
     :param svm_seed: Seed used for RNG in SVM
-    :return:
+    :return: Return the accuracy and fairness score for the classifier
     """
     return svm(training_data=training_data, test_data=test_data, fairness_metric=fairness_metric,
                accuracy_metric=accuracy_metric, C=C, gamma=gamma, keep_features=keep_features,

@@ -1,13 +1,12 @@
-from src.experiment_old.reweighing import svm_reweighing_experiment
-from src.experiment_old.baseline import svm_experiment
-from src.experiment_old.disparate_impact_remover import svm_dir_experiment
-from src.experiment_old.optimpreproc import svm_optimpreproc_experiment
+from src.exploring.experiment_old.reweighing import svm_reweighing_experiment
+from src.exploring.experiment_old.baseline import svm_experiment
+from src.exploring.experiment_old.disparate_impact_remover import svm_dir_experiment
+from src.exploring.experiment_old.optimpreproc import svm_optimpreproc_experiment
 from src.util.plotter import plot_results
 from src.util.filehandler import read_result_from_file
 from src.data import load_german_dataset
 from aif360.algorithms.preprocessing.optim_preproc_helpers.data_preproc_functions import load_preproc_data_german
-from src.metrics import statistical_parity_difference, theil_index, disparate_impact, average_odds_difference, \
-    equal_opportunity_difference, binary_accuracy, auc
+from src.metrics import statistical_parity_difference, binary_accuracy
 
 """
 Configuration

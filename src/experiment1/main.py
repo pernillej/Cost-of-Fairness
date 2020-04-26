@@ -67,17 +67,23 @@ def run_experiments():
 def plot():
     svm_results = read_result_from_file('svm_24-04-2020_10-08.txt')
     svm_results1 = read_result_from_file('svm_24-04-2020_20-59.txt')
+    svm_results2 = read_result_from_file('svm_26-04-2020_01-28.txt')
     reweighing_results = read_result_from_file('svm_reweighing_24-04-2020_12-30.txt')
     reweighing_results1 = read_result_from_file('svm_reweighing_24-04-2020_23-07.txt')
+    reweighing_results2 = read_result_from_file('svm_reweighing_26-04-2020_03-50.txt')
     dir_results = read_result_from_file('svm_dir_25-04-2020_16-41.txt')
     dir_results1 = read_result_from_file('svm_dir_25-04-2020_23-06.txt')
+    dir_results2 = read_result_from_file('svm_dir_26-04-2020_06-15.txt')
     optimpreproc_results = read_result_from_file('svm_optimpreproc_24-04-2020_18-33.txt')
     optimpreproc_results1 = read_result_from_file('svm_optimpreproc_25-04-2020_02-16.txt')
+    optimpreproc_results2 = read_result_from_file('svm_optimpreproc_26-04-2020_07-38.txt')
 
-    plot_results([svm_results, svm_results1, reweighing_results, reweighing_results1, dir_results, dir_results1,
-                  optimpreproc_results, optimpreproc_results1])
+    # plot_results([svm_results, svm_results1, svm_results2])
+    # plot_results([reweighing_results, reweighing_results1, reweighing_results2])
+    # plot_results([dir_results, dir_results1, dir_results2])
+    plot_results([optimpreproc_results, optimpreproc_results1, optimpreproc_results2])
 
 
-run_experiments()
-# plot()
+# run_experiments()
+plot()
 

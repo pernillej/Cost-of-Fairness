@@ -63,4 +63,3 @@ def run_experiments(config):
 
 
 run_experiments(statistical_parity_config)
-

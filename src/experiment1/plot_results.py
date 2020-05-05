@@ -24,4 +24,5 @@ def plot(filenames):
         plot_results(results)
 
 
+plot(STATISTICAL_PARITY_RESULTS)
 plot(THEIL_RESULTS)

@@ -10,15 +10,14 @@ Collects scores already calculated to remove unnecessary burden of recalculating
 FITNESS_SCORES = {}
 
 
-def svm_reweighing_experiment(C, gamma, selected_features, num_generations, population_size, mutation_rate,
+def svm_reweighing_experiment(classifier_chromosome, num_generations, population_size, mutation_rate,
                               crossover_rate, chromosome_length, fairness_metric, accuracy_metric, training_data,
-                              test_data, privileged_groups, unprivileged_groups, max_iter, svm_seed):
+                              test_data, privileged_groups, unprivileged_groups, max_iter, svm_seed, name_postfix):
     """
     SVM with Reweighing experiment.
 
-    :param C: The value for the C parameter of SVM
-    :param gamma: The value for the gamma parameter of SVM
-    :param selected_features: The selected features for SVM
+    :param classifier_chromosome: Chromosome representing the SVM classifier,
+                                  containing the C & gamma values and the feature subset
     :param num_generations: Number of generations for NSGA-II
     :param population_size: Population size for NSGA-II
     :param mutation_rate: Mutation rate for NSGA-II
@@ -32,9 +31,13 @@ def svm_reweighing_experiment(C, gamma, selected_features, num_generations, popu
     :param unprivileged_groups: The unprivileged groups in the data set
     :param max_iter: Max iterations for SVM
     :param svm_seed: Seed used for RNG in SVM
+    :param name_postfix: Postfix to add to name of saved result file
     :return: Resulting Pareto front
     """
     # Train classifier
+    C = get_C(classifier_chromosome)
+    gamma = get_gamma(classifier_chromosome)
+    selected_features = get_selected_features(classifier_chromosome, 30)
     svm_reweighing_classifier, svm_reweighing_scale = train_svm_reweighing(training_data=training_data, C=C,
                                                                            gamma=gamma, keep_features=selected_features,
                                                                            max_iter=max_iter, svm_seed=svm_seed,
@@ -84,6 +87,6 @@ def svm_reweighing_experiment(C, gamma, selected_features, num_generations, popu
                       'nsga2_parameters': {'num_generations': num_generations, 'population_size': population_size,
                                            'crossover_rate': crossover_rate, 'mutation_rate': mutation_rate,
                                            'chromosome_length': chromosome_length}}
-    write_result_to_file(result_summary, "svm_reweighing")
+    write_result_to_file(result_summary, "svm_reweighing_" + name_postfix)
     # Return only the result, not the summary
     return result

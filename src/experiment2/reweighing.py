@@ -85,6 +85,6 @@ def svm_reweighing_experiment(classifier_chromosome, num_generations, population
                       'nsga2_parameters': {'num_generations': num_generations, 'population_size': population_size,
                                            'crossover_rate': crossover_rate, 'mutation_rate': mutation_rate,
                                            'chromosome_length': chromosome_length}}
-    write_result_to_file(result_summary, "svm_reweighing" + name_postfix)
+    write_result_to_file(result_summary, "svm_reweighing_" + name_postfix)
     # Return only the result, not the summary
     return result

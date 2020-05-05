@@ -67,7 +67,7 @@ def svm_reweighing_experiment(num_generations, population_size, mutation_rate, c
                    evaluation_algorithm=evaluation_function)
 
     # Writes summary to file
-    result_summary = {'name': 'SVM_Reweighing',
+    result_summary = {'name': 'SVM_Reweighing_',
                       'result': result,
                       'fairness_metric': function_name_to_string(fairness_metric),
                       'accuracy_metric': function_name_to_string(accuracy_metric),

@@ -15,3 +15,5 @@ This code is verified to run using:
 |aif360      |0.2.3  |     |
 |pandas      |0.24.2 |At the time of writing the code appears incompatible with the newest versions of pandas. We believe this is because of the pandas version used by aif360.|
 |matplotlib  |3.1.0  |     |
+
+## User guide

@@ -3,6 +3,8 @@ from sklearn.preprocessing import StandardScaler
 from aif360.algorithms.preprocessing import Reweighing, DisparateImpactRemover
 from aif360.metrics import ClassificationMetric
 import numpy as np
+from sklearn.utils.testing import ignore_warnings
+from sklearn.exceptions import ConvergenceWarning
 
 
 def test_classifier(classifier, scale, test_data, fairness_metric, accuracy_metric, keep_features,
@@ -46,6 +48,7 @@ def test_classifier(classifier, scale, test_data, fairness_metric, accuracy_metr
     return accuracy_score, fairness_score
 
 
+@ignore_warnings(category=ConvergenceWarning)
 def train_svm(training_data, C, gamma, keep_features, max_iter, svm_seed):
     """
     Train SVM(SVC) classifier on specified data set, with provided parameters, and calculate fitness scores.
@@ -75,6 +78,7 @@ def train_svm(training_data, C, gamma, keep_features, max_iter, svm_seed):
     return clf, scale
 
 
+@ignore_warnings(category=ConvergenceWarning)
 def train_svm_reweighing(training_data, C, gamma, keep_features, privileged_groups, unprivileged_groups, max_iter,
                          svm_seed):
     """
@@ -112,6 +116,7 @@ def train_svm_reweighing(training_data, C, gamma, keep_features, privileged_grou
     return clf, scale
 
 
+@ignore_warnings(category=ConvergenceWarning)
 def train_svm_dir(training_data, C, gamma, keep_features, sensitive_attribute, max_iter, svm_seed):
     """
     Train the SVM classifier with Disparate Impact Remover preprocessing on specified data set,
@@ -147,6 +152,7 @@ def train_svm_dir(training_data, C, gamma, keep_features, sensitive_attribute, m
     return clf, scale
 
 
+@ignore_warnings(category=ConvergenceWarning)
 def train_svm_optimpreproc(training_data, C, gamma, keep_features, max_iter, svm_seed):
     """
     Train SVM classifier with Optimized Preprocessing method on specified data set,

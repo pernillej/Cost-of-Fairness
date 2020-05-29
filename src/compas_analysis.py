@@ -28,7 +28,8 @@ def plot_label_distribution(dataset_metric, y_ticks, title='Distribution of labe
     plt.gca().set_yticks(y_ticks)
     plt.title(title)
     for i in range(len(count)):
-        plt.text(x=x_ticks[i] - 0.1, y=count[i] + y_ticks[-1]*0.01, s=str(int(count[i])), size=13)
+        plt.text(x=x_ticks[i] - 0.2, y=count[i] + y_ticks[-1]*0.01,
+                 s=str(int(count[i])) + '(' + str(round(count[i]/sum(count)*100, 1)) + '%)', size=13)
     plt.show()
 
 
@@ -43,7 +44,8 @@ def plot_priv_label_distribution(dataset_metric, y_ticks, title='Distribution of
     plt.gca().set_yticks(y_ticks)
     plt.title(title)
     for i in range(len(count)):
-        plt.text(x=x_ticks[i] - 0.1, y=count[i] + y_ticks[-1]*0.01, s=str(int(count[i])), size=13)
+        plt.text(x=x_ticks[i] - 0.2, y=count[i] + y_ticks[-1]*0.01,
+                 s=str(int(count[i])) + '(' + str(round(count[i]/sum(count)*100, 1)) + '%)', size=13)
     plt.show()
 
 
@@ -58,7 +60,8 @@ def plot_unpriv_label_distribution(dataset_metric, y_ticks, title='Distribution 
     plt.gca().set_yticks(y_ticks)
     plt.title(title)
     for i in range(len(count)):
-        plt.text(x=x_ticks[i] - 0.1, y=count[i] + y_ticks[-1]*0.01, s=str(int(count[i])), size=13)
+        plt.text(x=x_ticks[i] - 0.2, y=count[i] + y_ticks[-1]*0.01,
+                 s=str(int(count[i])) + '(' + str(round(count[i]/sum(count)*100, 1)) + '%)', size=13)
     plt.show()
 
 
@@ -72,7 +75,8 @@ def plot_race_distribution(dataset, y_ticks, title='Distribution of race attribu
     plt.gca().set_yticks(y_ticks)
     plt.title(title)
     for i in range(len(count)):
-        plt.text(x=x_ticks[i] - 0.1, y=count[i] + y_ticks[-1]*0.01, s=str(int(count[i])), size=13)
+        plt.text(x=x_ticks[i] - 0.2, y=count[i] + y_ticks[-1]*0.01,
+                 s=str(int(count[i])) + '(' + str(round(count[i]/sum(count)*100, 1)) + '%)', size=13)
     plt.show()
 
 

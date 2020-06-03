@@ -17,7 +17,7 @@ This code is verified to run using:
 |matplotlib  |3.1.0  |     |
 
 ## User guide
-The project consists of code for running 3 different experiments. The code for each experiment is contained in 3 separate folders. In addition, some code is used across experiments and exist in it's own folders.
+The project consists of code for running 3 different experiments. The code for each experiment is contained in 3 separate folders. In addition, some code is used across experiments and exist in their own folders.
 In order to run the code the requirements, as described above, have to be installed. 
 
 #### Content description
@@ -26,7 +26,7 @@ In order to run the code the requirements, as described above, have to be instal
 - `src/compas_analysis.py` - This file contains the code used to analyse the COMPAS data set that is used in all 3 experiments.
 - `src/data.py` - This file contains the code used to gather the COMPAS data set from `aif360`.
 - `src/metrics.py` - This file defines the possible fairness and accuracy metrics that can be used in each experiment.
-- `src/experiment1`, `src/experiment2`, `src/experiment3` - These folders contains the code used to run each respective experiment. Each folder contains:
+- `src/experiment1`, `src/experiment2`, `src/experiment3` - These folders contain the code used to run each respective experiment. Each folder contains:
     - `/results` - This folder is used to store the results as .txt files containing json dictionaries describing the results and configurations from each run of the experiment.
     - `algorithms.py` - This file defines the 4 algorithms: `svm`, `svm_reweighing`, `svm_dir`, `svm_optimpreproc`. See thesis for the purpose of these algorithms. 
     - `config.py` - This file defines the run configurations for the experiment.
@@ -35,10 +35,10 @@ In order to run the code the requirements, as described above, have to be instal
     - `baseline.py`, `disparate_impact_remover.py`, `optimpreproc.py`, `reweighing.py` - These files initiate each algorithm into the NSGA-II optimization approach, by running NSGA-II using the proper parameters, and defining the evaluation function to be used by NSGA-II.
 
 #### Running an experiment
-Each experiment folder contains it's own `main.py` file. Running this file will run the entire experiment as it was performed in the thesis.
+Each experiment folder contains its own `main.py` file. Running this file will run the entire experiment as it was performed in the thesis.
 
 ##### Run configurations
-Each experiment folder also contains it's own `config.py` file that can be used to update NSGA-II parameters like number of generations, population size, mutation and crossover rate. 
+Each experiment folder also contains its own `config.py` file that can be used to update NSGA-II parameters like number of generations, population size, mutation and crossover rate. 
 The max iterations and seed used for the SVM classifiers can also be changed. 
 Finally, it is also possible to update which fairness and accuracy metrics are used.
 
